@@ -2,6 +2,16 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.37
+- Fix : le mod cassait le bloc au niveau des pieds avant celui à hauteur de tête, alors que le viseur (caméra à niveau) pointe la tête — donnait l'impression de casser "en bas" au lieu de "devant". La tête est maintenant cassée en priorité.
+
+## 0.0.36
+- Message chat d'activation/désactivation coloré (vert/rouge) au lieu de blanc.
+- HUD de minage déplaçable : `Position HUD X`/`Position HUD Y` dans `/miningbot` (position en pixels, coin haut-gauche du panneau, sauvegardée dans la config).
+
+## 0.0.35
+- En vol (créatif/spectateur), le bot n'attend plus un sol sous les pieds pour avancer : l'esquive de trou (réservée à `Verrouiller le niveau Y`) est ignorée pendant le vol, puisqu'un joueur qui vole ne tombe pas.
+
 ## 0.0.34
 - Suppression des styles Zigzag et Cercle : le mod ne mine plus qu'en ligne droite (direction figée à l'activation, comme avant). Le champ `pattern` disparaît de la config, le bouton "Style" de l'écran `/miningbot` aussi.
 

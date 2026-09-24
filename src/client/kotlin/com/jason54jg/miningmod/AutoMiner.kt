@@ -1,6 +1,7 @@
 package com.jason54jg.miningmod
 
 import com.jason54jg.miningmod.client.AlertManager
+import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.MultiPlayerGameMode
 import net.minecraft.client.player.LocalPlayer
@@ -45,9 +46,9 @@ object AutoMiner {
 
     fun toggle(client: Minecraft) {
         active = !active
-        client.player?.sendSystemMessage(
-            Component.literal(if (active) "Minage automatique activé" else "Minage automatique désactivé")
-        )
+        val message = if (active) "Minage automatique activé" else "Minage automatique désactivé"
+        val color = if (active) ChatFormatting.GREEN else ChatFormatting.RED
+        client.player?.sendSystemMessage(Component.literal(message).withStyle(color))
         if (active) {
             MiningStats.startSession()
             baseFacing = client.player?.direction
@@ -156,11 +157,13 @@ object AutoMiner {
         val halfWidth = config.tunnelWidth.coerceIn(0, 2)
         val lateralOffsets = -halfWidth..halfWidth
 
+        // Tête avant pieds : le joueur regarde à hauteur des yeux (viseur au niveau de la tête), donc
+        // c'est ce bloc-là qui doit visiblement se casser en premier, pas celui du sol sous le viseur.
         val path = (1..lookahead).flatMap { step ->
             val forward = origin.relative(facing, step)
             lateralOffsets.flatMap { offset ->
                 val lateral = offsetPosition(forward, facing, offset)
-                listOf(lateral, lateral.above())
+                listOf(lateral.above(), lateral)
             }
         }
         val immediateForward = origin.relative(facing, 1)
@@ -252,10 +255,10 @@ object AutoMiner {
         if (immediate.any { !level.getBlockState(it).isAir }) return false
 
         var verticalMotion = player.deltaMovement.y
-        // Sans verrouillage de couche Y, aucune hauteur à maintenir : le bot ignore les trous et
-        // laisse la gravité faire son travail au lieu de sauter/s'arrêter (le bloc devant, lui,
-        // reste cassé normalement quoi qu'il arrive : voir mineOrAdvance).
-        if (config.lockYLevel && feet.any { level.getBlockState(it.below()).isAir }) {
+        // Sans verrouillage de couche Y, ou en vol (créatif/spectateur), aucune hauteur à
+        // maintenir : le bot ignore les trous et avance tout droit sans se soucier du sol
+        // (le bloc devant, lui, reste cassé normalement quoi qu'il arrive : voir mineOrAdvance).
+        if (config.lockYLevel && !player.abilities.flying && feet.any { level.getBlockState(it.below()).isAir }) {
             // Trou d'un seul bloc de large : saute par-dessus plutôt que de s'arrêter. Un trou plus large
             // (pas de sol non plus deux blocs après) reste bloquant : on attend/mine plutôt que de tomber.
             val landing = feet.map { it.relative(facing, 1) }

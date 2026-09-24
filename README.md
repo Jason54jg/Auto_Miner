@@ -2,13 +2,13 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.34** (voir [CHANGELOG.md](CHANGELOG.md))
+Version actuelle : **0.0.37** (voir [CHANGELOG.md](CHANGELOG.md))
 
 ## Fonctionnalités
 
-- Touche **B** (rebindable dans les options du jeu) pour activer/désactiver le minage automatique — un message dans le chat confirme à chaque fois ("Minage automatique activé"/"désactivé").
+- Touche **B** (rebindable dans les options du jeu) pour activer/désactiver le minage automatique — un message coloré dans le chat confirme à chaque fois ("Minage automatique activé" en vert, "désactivé" en rouge).
 - Une fois activé, le mod :
-  - casse les blocs devant le joueur (pieds + tête), dans la direction figée au moment de l'activation ;
+  - casse les blocs devant le joueur (tête d'abord, puis pieds — le viseur pointe la tête), dans la direction figée au moment de l'activation ;
   - fait avancer le joueur dans le tunnel une fois celui-ci dégagé ;
   - **exception minerai** : un minerai (vanilla ou tag `c:ores` pour la compatibilité avec d'autres mods) qui touche le tunnel est cassé avant de continuer, même s'il n'est pas exactement dans l'axe de percement. Le **bloc obligatoire**, lui, est détecté à portée tout autour du joueur (devant, derrière, sur les côtés, au-dessus, en dessous), pas seulement s'il touche le tunnel.
   - le joueur n'a plus rien à faire une fois activé : le mod pilote entièrement le déplacement **et** la caméra, aucun mouvement ni visée n'est nécessaire.
@@ -21,12 +21,13 @@ Version actuelle : **0.0.34** (voir [CHANGELOG.md](CHANGELOG.md))
   - `Verrouiller le niveau Y` + `Couche Y` : le tunnel reste à la hauteur choisie plutôt qu'à celle où le minage a été activé. Le mod descend automatiquement (casse le bloc sous les pieds, attend d'atterrir, recommence) jusqu'à cette couche avant de creuser à l'horizontale — pas un vrai pathfinding, juste une descente verticale, qui s'arrête net sur un bloc incassable ou un liquide.
   - `Largeur du tunnel` : élargit la zone minée latéralement (utile avec un outil qui a son propre effet de zone, ou juste pour creuser plus large).
   - **Slot "Bloc obligatoire"** : vise le bloc voulu dans le monde, puis ouvre `/miningbot` et clique sur le slot — désigne ce bloc custom comme à casser impérativement dès qu'il est détecté à portée, où qu'il soit autour du joueur (contrairement aux minerais vanilla, limités à ce qui touche le tunnel). Utile sur un serveur moddé avec ses propres blocs de ressource. Choix en mémoire seulement (comme le slot outil).
+  - `Position HUD X`/`Position HUD Y` : déplace le panneau du HUD de minage (coin haut-gauche par défaut) où tu veux à l'écran, en pixels.
   - Réglages sauvegardés dans `config/miningmod.json` (sauf le slot outil et le bloc obligatoire, volontairement non persistés).
 - **Alertes téléportation/mention** (actives uniquement pendant que le minage tourne) : un son (ding) et un flash rouge de l'écran pendant 3 secondes se déclenchent si :
   - le joueur se déplace de façon anormale en un seul tick (téléportation, TP admin, etc.) ;
   - le pseudo du joueur apparaît dans un message de chat reçu (mention).
 - Minage tout droit uniquement : la direction est figée dès l'activation (plus jamais liée au regard en direct) et la caméra reste fixe dessus tant que le minage tourne.
-- Le bot ne marche pas dans le vide **si `Verrouiller le niveau Y` est actif** : sans sol devant (trou, ravin), il saute par-dessus si le trou fait 1 bloc de large, sinon il s'arrête au lieu de tomber. Sans verrouillage, aucune couche à maintenir : il ignore les trous et se laisse tomber dedans en continuant tout droit — le bloc devant lui, s'il y en a un, est cassé normalement dans tous les cas.
+- Le bot ne marche pas dans le vide **si `Verrouiller le niveau Y` est actif** (et que le joueur ne vole pas) : sans sol devant (trou, ravin), il saute par-dessus si le trou fait 1 bloc de large, sinon il s'arrête au lieu de tomber. Sans verrouillage, ou en vol créatif/spectateur, aucune hauteur à maintenir : il ignore les trous et avance tout droit sans se soucier du sol — le bloc devant lui, s'il y en a un, est cassé normalement dans tous les cas.
 - Le bloc qui porte le joueur n'est jamais cassé, même s'il correspond à un minerai/bloc obligatoire détecté juste sous les pieds — évite de tomber dans le vide en minant son propre plancher.
 - **Touche "libérer la souris"** (`key.miningmod.ungrab`, par défaut `N`) : évite qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille.
 - **Slot outil** (écran de config) : case cliquable qui capture l'objet actuellement en main du joueur comme outil de minage ; le mod l'équipe automatiquement depuis la hotbar avant de miner. Choix en mémoire seulement (non sauvegardé entre deux lancements du jeu).

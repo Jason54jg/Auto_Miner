@@ -23,6 +23,8 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
     private var blocksRowY = 0
     private var targetYRowY = 0
     private var tunnelWidthRowY = 0
+    private var hudXRowY = 0
+    private var hudYRowY = 0
     private var toolSlotX = 0
     private var toolSlotY = 0
     private var oreSlotX = 0
@@ -61,6 +63,18 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         tunnelWidthRowY = y
         addRenderableWidget(numberField(centerX + 10, y, config.tunnelWidth.toString()) { text ->
             text.toIntOrNull()?.let { config = config.copy(tunnelWidth = it.coerceIn(0, 2)) }
+        })
+        y += 24
+
+        hudXRowY = y
+        addRenderableWidget(numberField(centerX + 10, y, config.hudX.toString()) { text ->
+            text.toIntOrNull()?.let { config = config.copy(hudX = it) }
+        })
+        y += 24
+
+        hudYRowY = y
+        addRenderableWidget(numberField(centerX + 10, y, config.hudY.toString()) { text ->
+            text.toIntOrNull()?.let { config = config.copy(hudY = it) }
         })
         y += 24
 
@@ -113,6 +127,8 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         graphics.text(font, "Blocs/tick :", x, blocksRowY + 6, white, true)
         graphics.text(font, "Couche Y :", x, targetYRowY + 6, white, true)
         graphics.text(font, "Largeur tunnel :", x, tunnelWidthRowY + 6, white, true)
+        graphics.text(font, "Position HUD X :", x, hudXRowY + 6, white, true)
+        graphics.text(font, "Position HUD Y :", x, hudYRowY + 6, white, true)
 
         val tool = ToolSelection.item
         if (tool != null) {
@@ -138,6 +154,7 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         )
         MiningModConfig.save(finalConfig)
         AutoMiner.applyConfig(finalConfig)
+        MiningHud.applyConfig(finalConfig)
         minecraft?.gui?.setScreen(parent)
     }
 

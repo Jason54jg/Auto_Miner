@@ -15,6 +15,9 @@ data class MiningModConfig(
     var targetY: Int = -59,
     /** Rayon latéral du tunnel : 0 = 1 colonne (par défaut), 1 = 3 colonnes, 2 = 5 colonnes. */
     var tunnelWidth: Int = 0,
+    /** Position du HUD de minage (coin haut-gauche du panneau), en pixels depuis le bord de l'écran. */
+    var hudX: Int = 6,
+    var hudY: Int = 6,
     /** Identifiant ("namespace:path") de l'outil/du bloc obligatoire choisis, pour survivre à un redémarrage. */
     var toolItemId: String? = null,
     var customBlockId: String? = null
