@@ -32,6 +32,13 @@ object AutoMiner {
     private const val CIRCLE_INITIAL_LENGTH = 8
     private const val CIRCLE_LEGS_BEFORE_GROWTH = 4
 
+    // La caméra ne tourne jamais de plus de cet angle par rapport à la direction de départ,
+    // même si le tunnel fait un cran à 90° : reste dans le champ de vision du joueur.
+    private const val MAX_VIEW_DEVIATION = 30f
+
+    // Vitesse verticale d'un saut vanilla (sans effet de saut) : utilisée pour franchir un trou d'un seul bloc.
+    private const val JUMP_VELOCITY = 0.42
+
     var active = false
         private set
 
@@ -108,10 +115,16 @@ object AutoMiner {
         return true
     }
 
-    /** En zigzag/cercle, tourne la tête et le corps du joueur vers la direction pilotée par le mod. */
+    /**
+     * En zigzag/cercle, tourne légèrement la tête vers la direction pilotée par le mod, sans
+     * jamais dépasser [MAX_VIEW_DEVIATION] par rapport à la direction de départ : le tunnel peut
+     * faire des crans à 90°, mais la caméra reste dans le champ de vision d'origine du joueur.
+     */
     private fun syncViewToFacing(player: LocalPlayer) {
         if (config.pattern == MiningPattern.STRAIGHT) return
-        val yaw = yawFor(currentFacing ?: return)
+        val base = yawFor(baseFacing ?: return)
+        val target = yawFor(currentFacing ?: return)
+        val yaw = base + clampAngleDelta(target - base, MAX_VIEW_DEVIATION)
         player.yRot = yaw
         player.yHeadRot = yaw
     }
@@ -122,6 +135,14 @@ object AutoMiner {
         Direction.NORTH -> 180f
         Direction.EAST -> 270f
         else -> 0f
+    }
+
+    /** Ramène [delta] (en degrés) dans (-180, 180], puis le limite à ±[max]. */
+    private fun clampAngleDelta(delta: Float, max: Float): Float {
+        var normalized = delta % 360f
+        if (normalized > 180f) normalized -= 360f
+        if (normalized < -180f) normalized += 360f
+        return normalized.coerceIn(-max, max)
     }
 
     /** Équipe l'outil choisi dans la configuration s'il est présent dans la hotbar. */
@@ -155,10 +176,8 @@ object AutoMiner {
             }
         }
         val immediateForward = origin.relative(facing, 1)
-        val immediate = lateralOffsets.flatMap { offset ->
-            val lateral = offsetPosition(immediateForward, facing, offset)
-            listOf(lateral, lateral.above())
-        }
+        val immediateFeet = lateralOffsets.map { offset -> offsetPosition(immediateForward, facing, offset) }
+        val immediate = immediateFeet.flatMap { listOf(it, it.above()) }
 
         val ores = path
             .flatMap { pos -> Direction.values().map(pos::relative) }
@@ -170,7 +189,7 @@ object AutoMiner {
 
         if (current == null) {
             target = null
-            advance(player, level, immediate, facing)
+            advance(player, level, immediate, immediateFeet, facing)
             return false
         }
 
@@ -215,10 +234,19 @@ object AutoMiner {
         return state.block == CustomOreSelection.block
     }
 
-    private fun advance(player: LocalPlayer, level: Level, immediate: List<BlockPos>, facing: Direction) {
+    private fun advance(player: LocalPlayer, level: Level, immediate: List<BlockPos>, feet: List<BlockPos>, facing: Direction) {
         if (immediate.any { !level.getBlockState(it).isAir }) return
-        val motion = player.deltaMovement
-        player.deltaMovement = Vec3(facing.stepX * WALK_SPEED, motion.y, facing.stepZ * WALK_SPEED)
+
+        var verticalMotion = player.deltaMovement.y
+        if (feet.any { level.getBlockState(it.below()).isAir }) {
+            // Trou d'un seul bloc de large : saute par-dessus plutôt que de s'arrêter. Un trou plus large
+            // (pas de sol non plus deux blocs après) reste bloquant : on attend/mine plutôt que de tomber.
+            val landing = feet.map { it.relative(facing, 1) }
+            if (landing.any { level.getBlockState(it.below()).isAir }) return
+            if (player.onGround()) verticalMotion = JUMP_VELOCITY
+        }
+
+        player.deltaMovement = Vec3(facing.stepX * WALK_SPEED, verticalMotion, facing.stepZ * WALK_SPEED)
         onAdvanced()
     }
 
@@ -262,7 +290,9 @@ object AutoMiner {
 
     private fun isBreakable(level: Level, pos: BlockPos): Boolean {
         val state = level.getBlockState(pos)
-        if (state.isAir || !state.fluidState.isEmpty) return false
+        // state.liquid() exclut l'eau/lave elles-mêmes, mais pas un bloc solide "waterlogged"
+        // (un minerai custom immergé, par ex.) : ça, c'est bien un bloc à casser.
+        if (state.isAir || state.liquid()) return false
         return state.getDestroySpeed(level, pos) >= 0f
     }
 }

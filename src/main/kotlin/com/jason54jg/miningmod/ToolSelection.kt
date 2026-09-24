@@ -1,12 +1,21 @@
 package com.jason54jg.miningmod
 
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.Items
 
 /**
  * Outil choisi dans la configuration pour le minage automatique (le mod l'équipe s'il est
- * dans la hotbar). Volontairement non persisté entre les sessions du jeu : capturé depuis
- * la main du joueur au moment du clic dans la "slot" de la configuration.
+ * dans la hotbar). Persisté via [MiningModConfig.toolItemId] (résolu au chargement).
  */
 object ToolSelection {
-    var item: Item? = null
+    var item: Item? = MiningModConfig.load().toolItemId?.let(::resolve)
+
+    fun idOf(item: Item): String = BuiltInRegistries.ITEM.getKey(item).toString()
+
+    private fun resolve(id: String): Item? {
+        val identifier = runCatching { Identifier.parse(id) }.getOrNull() ?: return null
+        return BuiltInRegistries.ITEM.get(identifier).takeUnless { it == Items.AIR }
+    }
 }

@@ -143,8 +143,12 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
     }
 
     private fun onDone() {
-        MiningModConfig.save(config)
-        AutoMiner.applyConfig(config)
+        val finalConfig = config.copy(
+            toolItemId = ToolSelection.item?.let(ToolSelection::idOf),
+            customBlockId = CustomOreSelection.block?.let(CustomOreSelection::idOf)
+        )
+        MiningModConfig.save(finalConfig)
+        AutoMiner.applyConfig(finalConfig)
         minecraft?.gui?.setScreen(parent)
     }
 

@@ -38,7 +38,12 @@ object MiningModClient : ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             dispatcher.register(
                 ClientCommands.literal("miningbot").executes {
-                    Minecraft.getInstance().gui.setScreen(MiningModConfigScreen(null))
+                    // Le ChatScreen ferme l'écran courant (setScreen(null)) juste après l'envoi de la
+                    // commande, dans le même appel : ouvrir l'écran ici serait aussitôt écrasé. On le
+                    // reporte à la tâche suivante de la boucle client, une fois le chat déjà fermé.
+                    Minecraft.getInstance().execute {
+                        Minecraft.getInstance().gui.setScreen(MiningModConfigScreen(null))
+                    }
                     1
                 }
             )

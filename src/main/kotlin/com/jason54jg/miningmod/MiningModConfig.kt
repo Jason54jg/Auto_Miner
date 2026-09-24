@@ -21,7 +21,10 @@ data class MiningModConfig(
     var targetY: Int = -59,
     /** Rayon latéral du tunnel : 0 = 1 colonne (par défaut), 1 = 3 colonnes, 2 = 5 colonnes. */
     var tunnelWidth: Int = 0,
-    var pattern: MiningPattern = MiningPattern.STRAIGHT
+    var pattern: MiningPattern = MiningPattern.STRAIGHT,
+    /** Identifiant ("namespace:path") de l'outil/du bloc obligatoire choisis, pour survivre à un redémarrage. */
+    var toolItemId: String? = null,
+    var customBlockId: String? = null
 ) {
     companion object {
         private val GSON = GsonBuilder().setPrettyPrinting().create()

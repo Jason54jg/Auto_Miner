@@ -1,12 +1,22 @@
 package com.jason54jg.miningmod
 
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 
 /**
  * Bloc supplémentaire désigné par le joueur comme "à casser impérativement", en plus
  * de la liste de minerais vanilla (utile pour un bloc custom d'un serveur moddé).
- * Capturé depuis la main du joueur dans l'écran de configuration, non persisté.
+ * Persisté via [MiningModConfig.customBlockId] (résolu au chargement).
  */
 object CustomOreSelection {
-    var block: Block? = null
+    var block: Block? = MiningModConfig.load().customBlockId?.let(::resolve)
+
+    fun idOf(block: Block): String = BuiltInRegistries.BLOCK.getKey(block).toString()
+
+    private fun resolve(id: String): Block? {
+        val identifier = runCatching { Identifier.parse(id) }.getOrNull() ?: return null
+        return BuiltInRegistries.BLOCK.get(identifier).takeUnless { it == Blocks.AIR }
+    }
 }

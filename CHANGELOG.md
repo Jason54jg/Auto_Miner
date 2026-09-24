@@ -2,6 +2,22 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.25
+- Fix possible : `isBreakable` excluait tout bloc renvoyant un `fluidState` non vide, ce qui exclut aussi un bloc solide **waterlogged** (un minerai custom immergé, par ex.), pas seulement l'eau/la lave elles-mêmes. Utilise maintenant `state.liquid()` (vrai uniquement pour un bloc de fluide) pour ne plus bloquer un bloc obligatoire/minerai simplement parce qu'il est sous l'eau.
+
+## 0.0.24
+- Trou d'un seul bloc de large devant lui : le bot saute par-dessus au lieu de s'arrêter net. Un trou plus large (pas de sol non plus à l'atterrissage) reste bloquant comme avant (attend/mine plutôt que de tomber).
+
+## 0.0.23
+- Fix `/miningbot` : la commande n'ouvrait jamais l'écran de config (aucune erreur nulle part). Cause : `ChatScreen` ferme l'écran courant (`setScreen(null)`) juste après l'envoi de la commande, dans le même appel — ça écrasait aussitôt l'écran qu'on venait d'ouvrir depuis `executes`. L'ouverture est maintenant reportée à la tâche client suivante (`Minecraft.execute { ... }`), une fois le chat déjà fermé.
+
+## 0.0.22
+- Caméra en zigzag/cercle : ne tourne plus jamais de plus de 30° par rapport à la direction de départ, même quand le tunnel fait un cran à 90° (le déplacement/minage garde ses angles droits sur la grille de blocs, mais la vue reste dans le champ de vision d'origine). Limite connue : en cercle, une fois la spirale bien engagée, la direction réelle peut s'éloigner de la vue affichée (plafonnée à ±30°) — pas de suivi caméra parfait sur un virage complet.
+- Fix : le bot ne marche plus dans le vide (trou, ravin, mine à ciel ouvert) — vérifie qu'il y a un sol avant d'avancer, sinon il attend/mine au lieu de tomber.
+
+## 0.0.21
+- L'outil et le bloc obligatoire survivent maintenant à un redémarrage du jeu (`toolItemId`/`customBlockId` dans `config/miningmod.json`, résolus au chargement). Fix au passage : "Terminé" écrasait la sélection tout juste faite dans les slots avec l'ancienne config chargée à l'ouverture de l'écran — la sauvegarde inclut maintenant la sélection actuelle des slots.
+
 ## 0.0.20
 - Slot "Bloc obligatoire" : capture maintenant le bloc **visé** (regardé juste avant d'ouvrir la config) plutôt que l'objet en main. Vise le bloc voulu, puis ouvre `/miningbot` et clique sur le slot.
 

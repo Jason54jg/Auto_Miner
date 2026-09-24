@@ -2,7 +2,7 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.20** (voir [CHANGELOG.md](CHANGELOG.md))
+Version actuelle : **0.0.25** (voir [CHANGELOG.md](CHANGELOG.md))
 
 ## Fonctionnalités
 
@@ -28,7 +28,8 @@ Version actuelle : **0.0.20** (voir [CHANGELOG.md](CHANGELOG.md))
   - `Tout droit` (par défaut) : suit le regard, comme avant.
   - `Zigzag` : longues lignes droites (12 blocs) entrecoupées de petits crans latéraux courts (2 blocs) — mouvement doux, sans partir complètement à droite ou à gauche.
   - `Cercle` : tourne à droite après chaque bras ; bras assez longs dès le départ, qui grandissent lentement (spirale progressive, pas de virages serrés).
-  - En zigzag/cercle, la direction de minage est pilotée par le mod, qui tourne aussi la tête/vue du joueur pour suivre.
+  - En zigzag/cercle, la direction de minage est pilotée par le mod ; la caméra suit mais ne tourne jamais de plus de 30° par rapport à la direction de départ, pour rester dans le champ de vision (même quand le tunnel fait un cran à 90°).
+- Le bot ne marche pas dans le vide : s'il n'y a pas de sol devant (trou, ravin), il saute par-dessus si le trou fait 1 bloc de large, sinon il s'arrête au lieu de tomber.
 - **Touche "libérer la souris"** (`key.miningmod.ungrab`, par défaut `N`) : évite qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille.
 - **Slot outil** (écran de config) : case cliquable qui capture l'objet actuellement en main du joueur comme outil de minage ; le mod l'équipe automatiquement depuis la hotbar avant de miner. Choix en mémoire seulement (non sauvegardé entre deux lancements du jeu).
 - **HUD de minage** (coin haut-gauche, visible pendant que le minage est actif) :
