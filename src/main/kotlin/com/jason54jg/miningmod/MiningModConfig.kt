@@ -10,13 +10,6 @@ enum class MiningPattern {
     CIRCLE
 }
 
-/** Quels minerais afficher à travers les murs. */
-enum class XrayPreset {
-    NONE,
-    VALUABLE,
-    ALL
-}
-
 /**
  * Réglages persistés du mod, pour s'adapter aux serveurs non-vanilla
  * (portée étendue, capacités de casse multiple, etc.).
@@ -25,8 +18,7 @@ data class MiningModConfig(
     var reach: Double = 4.5,
     var blocksPerTick: Int = 1,
     var lockYLevel: Boolean = false,
-    var pattern: MiningPattern = MiningPattern.STRAIGHT,
-    var xrayPreset: XrayPreset = XrayPreset.NONE
+    var pattern: MiningPattern = MiningPattern.STRAIGHT
 ) {
     companion object {
         private val GSON = GsonBuilder().setPrettyPrinting().create()

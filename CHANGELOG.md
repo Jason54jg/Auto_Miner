@@ -2,6 +2,25 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.15
+- **X-ray entièrement supprimé** (fichiers, config, écran, appels) : `XrayRenderer.kt`, `XrayScanner.kt` supprimés ; `XrayPreset` et le champ `xrayPreset` retirés de la config ; bouton et libellé retirés de l'écran de configuration ; `OreBlocks.VALUABLE` retiré (n'était utilisé que par le x-ray, `OreBlocks.ALL` reste utilisé par le minage auto).
+
+## 0.0.14
+- **X-ray abandonné.** Construire un `RenderPipeline` personnalisé en 26.2 demande d'écrire ses propres shaders (`.withVertexShader`/`.withFragmentShader`) et de déclarer des `BindGroupLayout` (matrices de projection, etc.) — plus aucun snippet tout fait pour du simple position+couleur. Trop profond pour être fiable sans compilateur sous la main. `XrayRenderer.kt` est maintenant un stub qui ne dessine rien.
+- `XrayScanner` (scan des minerais en config) et le réglage "Voir à travers les murs" restent en place, inertes, prêts pour une vraie implémentation future si quelqu'un a une référence concrète de pipeline 26.2 fonctionnel.
+
+## 0.0.13
+- Fix build (x-ray) : `RenderType` a déménagé de `net.minecraft.client.renderer` vers `net.minecraft.client.renderer.rendertype` en 26.2. Confirmé par recherche croisée (primer NeoForge). Reste très probablement d'autres soucis dans `XrayRenderer.kt` : la refonte de `RenderType` va bien plus loin qu'un simple déplacement de package (`RenderType#draw` remplacé par `PreparedRenderType#drawFromBuffer`, `RenderType#create` pas encore vérifié pour 26.2).
+
+## 0.0.12
+- Fix build : module Fabric API renommé `fabric-key-binding-api-v1` → `fabric-key-mapping-api-v1` sur 26.2 (suit le renommage `KeyBinding`→`KeyMapping` côté Minecraft). `KeyBindingHelper.registerKeyBinding` → `net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper.registerKeyMapping`. Confirmé en regardant le code source de Fabric API sur la branche 26.2.
+
+## 0.0.11
+- Fix build : `ClientCommandManager` a été supprimé de Fabric API sur 26.2, remplacé par `ClientCommands` (même méthode `literal(...)`). Confirmé en regardant directement le code source de Fabric API sur la branche 26.2 (le fichier `ClientCommandManager.java` n'existe plus).
+
+## 0.0.10
+- Fix build : `Inventory.selectedSlot` est une propriété (getter réel `getSelectedSlot()`), pas une méthode "nue" comme `mainCamera()`/`gameRenderState()`. Retiré les parenthèses en trop (`inventory.selectedSlot()` → `inventory.selectedSlot`). Le setter `setSelectedSlot(Int)` reste appelé explicitement.
+
 ## 0.0.9
 Corrections suite à un vrai build local (Kotlin `compileClientKotlin`) — Minecraft 26.2 a renommé/supprimé beaucoup plus de choses que prévu :
 - `Identifier.of(...)` → `Identifier.fromNamespaceAndPath(...)` (le vrai nom, confirmé).
