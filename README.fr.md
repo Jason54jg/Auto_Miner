@@ -4,7 +4,7 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.39** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
+Version actuelle : **0.0.40** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
 
 ## Fonctionnalités
 
@@ -37,6 +37,7 @@ Version actuelle : **0.0.39** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
   - temps écoulé depuis l'activation ;
   - nombre total de blocs cassés ;
   - détail par type de minerai cassé (les variantes deepslate sont fusionnées avec le minerai de base).
+- **Interface traduite** : l'écran de config, le HUD et les messages chat suivent la langue du jeu du client (anglais par défaut, français fourni) via le système de traduction de Minecraft — comme les noms des touches. Le nom de l'outil/du bloc obligatoire utilise le vrai nom localisé fourni par Minecraft.
 
 ## Prérequis
 

@@ -1,5 +1,28 @@
 {
 	"key.categories.autominer.main": "Auto Miner",
 	"key.autominer.toggle": "Toggle auto-tunnel",
-	"key.autominer.ungrab": "Release/Grab mouse"
+	"key.autominer.ungrab": "Release/Grab mouse",
+
+	"screen.autominer.title": "Auto Miner",
+	"screen.autominer.reach": "Reach:",
+	"screen.autominer.blocks_per_tick": "Blocks/tick:",
+	"screen.autominer.y_level": "Y level:",
+	"screen.autominer.tunnel_width": "Tunnel width:",
+	"screen.autominer.hud_x": "HUD position X:",
+	"screen.autominer.hud_y": "HUD position Y:",
+	"screen.autominer.lock_y_yes": "Lock Y level: Yes",
+	"screen.autominer.lock_y_no": "Lock Y level: No",
+	"screen.autominer.tool": "Tool: %s",
+	"screen.autominer.tool_none": "hand (none chosen)",
+	"screen.autominer.mandatory_block": "Mandatory block (aim at it before opening): %s",
+	"screen.autominer.mandatory_block_none": "none",
+	"screen.autominer.done": "Done",
+
+	"hud.autominer.title": "Auto Miner",
+	"hud.autominer.time": "Time: %s",
+	"hud.autominer.blocks_broken": "Blocks broken: %s",
+	"hud.autominer.ore_count": "%s: %s",
+
+	"chat.autominer.enabled": "Automatic mining enabled",
+	"chat.autominer.disabled": "Automatic mining disabled"
 }

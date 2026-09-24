@@ -4,6 +4,9 @@
 
 Each new request bumps the version by `0.0.1`.
 
+## 0.0.40
+- In-game UI actually localized (not just the docs from 0.0.39): the config screen, HUD and chat activation messages were hardcoded French strings, ignoring the client's game language entirely. They now use Minecraft's translation system (`Component.translatable`, `en_us.json`/`fr_fr.json`), matching what the two keybind names already did. Tool/mandatory-block names now show Minecraft's own localized item/block name instead of a raw `snake_case` registry path.
+
 ## 0.0.39
 - Bilingual documentation: `README.md`/`CHANGELOG.md` in English (base language), `README.fr.md`/`CHANGELOG.fr.md` in French.
 

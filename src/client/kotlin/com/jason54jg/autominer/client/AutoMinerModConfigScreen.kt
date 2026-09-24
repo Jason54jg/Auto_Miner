@@ -4,7 +4,6 @@ import com.jason54jg.autominer.AutoMiner
 import com.jason54jg.autominer.CustomOreSelection
 import com.jason54jg.autominer.AutoMinerModConfig
 import com.jason54jg.autominer.ToolSelection
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
@@ -16,7 +15,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.BlockHitResult
 
-class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.literal("Auto Miner")) {
+class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.translatable("screen.autominer.title")) {
     private var config = AutoMinerModConfig.load()
 
     private var reachRowY = 0
@@ -104,7 +103,7 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.l
         y += 32
 
         addRenderableWidget(
-            Button.builder(Component.literal("Terminé")) { onDone() }
+            Button.builder(Component.translatable("screen.autominer.done")) { onDone() }
                 .bounds(centerX - 100, y, 200, 20)
                 .build()
         )
@@ -123,24 +122,24 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.l
 
         val x = width / 2 - 100
         val white = 0xFFFFFFFF.toInt()
-        graphics.text(font, "Portée :", x, reachRowY + 6, white, true)
-        graphics.text(font, "Blocs/tick :", x, blocksRowY + 6, white, true)
-        graphics.text(font, "Couche Y :", x, targetYRowY + 6, white, true)
-        graphics.text(font, "Largeur tunnel :", x, tunnelWidthRowY + 6, white, true)
-        graphics.text(font, "Position HUD X :", x, hudXRowY + 6, white, true)
-        graphics.text(font, "Position HUD Y :", x, hudYRowY + 6, white, true)
+        graphics.text(font, Component.translatable("screen.autominer.reach").string, x, reachRowY + 6, white, true)
+        graphics.text(font, Component.translatable("screen.autominer.blocks_per_tick").string, x, blocksRowY + 6, white, true)
+        graphics.text(font, Component.translatable("screen.autominer.y_level").string, x, targetYRowY + 6, white, true)
+        graphics.text(font, Component.translatable("screen.autominer.tunnel_width").string, x, tunnelWidthRowY + 6, white, true)
+        graphics.text(font, Component.translatable("screen.autominer.hud_x").string, x, hudXRowY + 6, white, true)
+        graphics.text(font, Component.translatable("screen.autominer.hud_y").string, x, hudYRowY + 6, white, true)
 
         val tool = ToolSelection.item
         if (tool != null) {
             graphics.item(ItemStack(tool), toolSlotX + 2, toolSlotY + 2)
         }
-        graphics.text(font, "Outil : ${toolName(tool)}", toolSlotX + 26, toolSlotY + 6, white, true)
+        graphics.text(font, toolLabel(tool), toolSlotX + 26, toolSlotY + 6, white, true)
 
         val ore = CustomOreSelection.block
         if (ore != null) {
             graphics.item(ItemStack(ore), oreSlotX + 2, oreSlotY + 2)
         }
-        graphics.text(font, "Bloc obligatoire (vise-le avant d'ouvrir) : ${oreName(ore)}", oreSlotX + 26, oreSlotY + 6, white, true)
+        graphics.text(font, mandatoryBlockLabel(ore), oreSlotX + 26, oreSlotY + 6, white, true)
     }
 
     override fun onClose() {
@@ -158,15 +157,16 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.l
         minecraft?.gui?.setScreen(parent)
     }
 
-    private fun lockYLabel() = Component.literal("Verrouiller le niveau Y : ${if (config.lockYLevel) "Oui" else "Non"}")
+    private fun lockYLabel() = Component.translatable(if (config.lockYLevel) "screen.autominer.lock_y_yes" else "screen.autominer.lock_y_no")
 
-    private fun toolName(tool: Item?): String {
-        if (tool == null) return "main (aucun choisi)"
-        return BuiltInRegistries.ITEM.getKey(tool).path.replace('_', ' ')
+    /** Nom localisé de l'item (celui déjà fourni par Minecraft/le mod qui l'ajoute), pas une clé à nous. */
+    private fun toolLabel(tool: Item?): String {
+        val name = if (tool == null) Component.translatable("screen.autominer.tool_none") else Component.translatable(tool.descriptionId)
+        return Component.translatable("screen.autominer.tool", name).string
     }
 
-    private fun oreName(block: Block?): String {
-        if (block == null) return "aucun"
-        return BuiltInRegistries.BLOCK.getKey(block).path.replace('_', ' ')
+    private fun mandatoryBlockLabel(block: Block?): String {
+        val name = if (block == null) Component.translatable("screen.autominer.mandatory_block_none") else Component.translatable(block.descriptionId)
+        return Component.translatable("screen.autominer.mandatory_block", name).string
     }
 }

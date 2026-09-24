@@ -1,5 +1,28 @@
 {
 	"key.categories.autominer.main": "Auto Miner",
 	"key.autominer.toggle": "Activer/Désactiver le tunnel automatique",
-	"key.autominer.ungrab": "Libérer/Reprendre la souris"
+	"key.autominer.ungrab": "Libérer/Reprendre la souris",
+
+	"screen.autominer.title": "Auto Miner",
+	"screen.autominer.reach": "Portée :",
+	"screen.autominer.blocks_per_tick": "Blocs/tick :",
+	"screen.autominer.y_level": "Couche Y :",
+	"screen.autominer.tunnel_width": "Largeur tunnel :",
+	"screen.autominer.hud_x": "Position HUD X :",
+	"screen.autominer.hud_y": "Position HUD Y :",
+	"screen.autominer.lock_y_yes": "Verrouiller le niveau Y : Oui",
+	"screen.autominer.lock_y_no": "Verrouiller le niveau Y : Non",
+	"screen.autominer.tool": "Outil : %s",
+	"screen.autominer.tool_none": "main (aucun choisi)",
+	"screen.autominer.mandatory_block": "Bloc obligatoire (vise-le avant d'ouvrir) : %s",
+	"screen.autominer.mandatory_block_none": "aucun",
+	"screen.autominer.done": "Terminé",
+
+	"hud.autominer.title": "Auto Miner",
+	"hud.autominer.time": "Temps : %s",
+	"hud.autominer.blocks_broken": "Blocs cassés : %s",
+	"hud.autominer.ore_count": "%s : %s",
+
+	"chat.autominer.enabled": "Minage automatique activé",
+	"chat.autominer.disabled": "Minage automatique désactivé"
 }

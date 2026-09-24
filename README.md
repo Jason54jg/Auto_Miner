@@ -4,7 +4,7 @@
 
 Fabric mod for Minecraft **26.2** that digs a straight tunnel automatically: a key toggles mining, the player advances while breaking the blocks in front of them, and systematically breaks any ore touching the tunnel.
 
-Current version: **0.0.39** (see [CHANGELOG.md](CHANGELOG.md))
+Current version: **0.0.40** (see [CHANGELOG.md](CHANGELOG.md))
 
 ## Features
 
@@ -37,6 +37,7 @@ Current version: **0.0.39** (see [CHANGELOG.md](CHANGELOG.md))
   - time elapsed since activation ;
   - total number of blocks broken ;
   - breakdown by ore type broken (deepslate variants are merged with the base ore).
+- **Localized UI**: config screen, HUD and chat messages follow the client's game language (English by default, French provided) via Minecraft's own translation system — same as the keybind names. Tool/mandatory-block names use Minecraft's own localized item/block name.
 
 ## Requirements
 

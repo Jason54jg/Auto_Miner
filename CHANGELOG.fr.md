@@ -4,6 +4,9 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.40
+- L'interface en jeu est maintenant vraiment traduite (pas juste la doc de la 0.0.39) : l'écran de config, le HUD et les messages chat d'activation étaient des chaînes françaises codées en dur, ignorant totalement la langue du client. Ils passent maintenant par le système de traduction de Minecraft (`Component.translatable`, `en_us.json`/`fr_fr.json`), comme les deux touches l'étaient déjà. Le nom de l'outil/du bloc obligatoire affiche maintenant le vrai nom localisé de l'item/bloc (fourni par Minecraft) au lieu d'un chemin de registre brut en `snake_case`.
+
 ## 0.0.39
 - Documentation bilingue : `README.md`/`CHANGELOG.md` en anglais (langue de base), `README.fr.md`/`CHANGELOG.fr.md` en français.
 

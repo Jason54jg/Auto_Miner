@@ -46,9 +46,9 @@ object AutoMiner {
 
     fun toggle(client: Minecraft) {
         active = !active
-        val message = if (active) "Minage automatique activé" else "Minage automatique désactivé"
+        val messageKey = if (active) "chat.autominer.enabled" else "chat.autominer.disabled"
         val color = if (active) ChatFormatting.GREEN else ChatFormatting.RED
-        client.player?.sendSystemMessage(Component.literal(message).withStyle(color))
+        client.player?.sendSystemMessage(Component.translatable(messageKey).withStyle(color))
         if (active) {
             MiningStats.startSession()
             baseFacing = client.player?.direction

@@ -5,6 +5,7 @@ import com.jason54jg.autominer.AutoMinerModConfig
 import com.jason54jg.autominer.MiningStats
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.network.chat.Component
 
 /** Petit panneau affiché pendant le minage : temps écoulé, blocs cassés, détail des minerais. */
 object MiningHud {
@@ -31,10 +32,12 @@ object MiningHud {
         val time = "%02d:%02d".format(elapsedSeconds / 60, elapsedSeconds % 60)
 
         val lines = buildList {
-            add("Auto Miner" to TITLE_COLOR)
-            add("Temps : $time" to TEXT_COLOR)
-            add("Blocs cassés : ${MiningStats.blocksBroken}" to TEXT_COLOR)
-            MiningStats.ores.forEach { (name, count) -> add("$name : $count" to TEXT_COLOR) }
+            add(Component.translatable("hud.autominer.title").string to TITLE_COLOR)
+            add(Component.translatable("hud.autominer.time", time).string to TEXT_COLOR)
+            add(Component.translatable("hud.autominer.blocks_broken", MiningStats.blocksBroken).string to TEXT_COLOR)
+            MiningStats.ores.forEach { (descriptionId, count) ->
+                add(Component.translatable("hud.autominer.ore_count", Component.translatable(descriptionId), count).string to TEXT_COLOR)
+            }
         }
 
         val panelWidth = lines.maxOf { (text, _) -> font.width(text) } + PADDING * 2
