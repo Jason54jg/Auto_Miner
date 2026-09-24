@@ -14,14 +14,20 @@ import net.minecraft.resources.Identifier
 import org.lwjgl.glfw.GLFW
 
 object MiningModClient : ClientModInitializer {
+    private var mouseUngrabbed = false
+
     override fun onInitializeClient() {
         val category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("miningmod", "main"))
         val toggleKey = KeyMappingHelper.registerKeyMapping(
             KeyMapping("key.miningmod.toggle", GLFW.GLFW_KEY_B, category)
         )
+        val ungrabKey = KeyMappingHelper.registerKeyMapping(
+            KeyMapping("key.miningmod.ungrab", GLFW.GLFW_KEY_N, category)
+        )
 
         ClientTickEvents.END_CLIENT_TICK.register { client ->
             while (toggleKey.consumeClick()) AutoMiner.toggle(client)
+            while (ungrabKey.consumeClick()) toggleMouseGrab(client)
             AutoMiner.tick(client)
             client.player?.let(AlertManager::checkTeleport)
         }
@@ -44,6 +50,16 @@ object MiningModClient : ClientModInitializer {
         }
         HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("miningmod", "alert_flash")) { graphics, _ ->
             ScreenFlash.render(graphics)
+        }
+    }
+
+    /** Libère/reprend la souris pour éviter que les mouvements de souris ne perturbent le minage automatique. */
+    private fun toggleMouseGrab(client: Minecraft) {
+        mouseUngrabbed = !mouseUngrabbed
+        if (mouseUngrabbed) {
+            client.mouseHandler.releaseMouse()
+        } else {
+            client.mouseHandler.grabMouse()
         }
     }
 }

@@ -1,47 +1,49 @@
 package com.jason54jg.miningmod.client
 
 import com.jason54jg.miningmod.AutoMiner
+import com.jason54jg.miningmod.CustomOreSelection
 import com.jason54jg.miningmod.MiningModConfig
 import com.jason54jg.miningmod.MiningPattern
 import com.jason54jg.miningmod.ToolSelection
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
 
 class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.literal("Mining Mod")) {
     private var config = MiningModConfig.load()
 
-    private val reachPresets = listOf(4.5, 8.0, 16.0, 32.0)
-    private val blocksPerTickPresets = listOf(1, 2, 4, 8)
     private val patternPresets = MiningPattern.values().toList()
-    private val targetYPresets = listOf(-59, -54, -32, 0, 11, 15, 63)
-    private val tunnelWidthPresets = listOf(0, 1, 2)
 
+    private var reachRowY = 0
+    private var blocksRowY = 0
+    private var targetYRowY = 0
+    private var tunnelWidthRowY = 0
     private var toolSlotX = 0
     private var toolSlotY = 0
+    private var oreSlotX = 0
+    private var oreSlotY = 0
 
     override fun init() {
         val centerX = width / 2
         var y = height / 2 - 134
 
-        addRenderableWidget(
-            Button.builder(reachLabel()) {
-                config = config.copy(reach = nextPreset(reachPresets, config.reach))
-                it.message = reachLabel()
-            }.bounds(centerX - 100, y, 200, 20).build()
-        )
+        reachRowY = y
+        addRenderableWidget(numberField(centerX + 10, y, config.reach.toString()) { text ->
+            text.toDoubleOrNull()?.let { config = config.copy(reach = it) }
+        })
         y += 24
 
-        addRenderableWidget(
-            Button.builder(blocksLabel()) {
-                config = config.copy(blocksPerTick = nextPreset(blocksPerTickPresets, config.blocksPerTick))
-                it.message = blocksLabel()
-            }.bounds(centerX - 100, y, 200, 20).build()
-        )
+        blocksRowY = y
+        addRenderableWidget(numberField(centerX + 10, y, config.blocksPerTick.toString()) { text ->
+            text.toIntOrNull()?.let { config = config.copy(blocksPerTick = it.coerceAtLeast(1)) }
+        })
         y += 24
 
         addRenderableWidget(
@@ -60,20 +62,16 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         )
         y += 24
 
-        addRenderableWidget(
-            Button.builder(targetYLabel()) {
-                config = config.copy(targetY = nextPreset(targetYPresets, config.targetY))
-                it.message = targetYLabel()
-            }.bounds(centerX - 100, y, 200, 20).build()
-        )
+        targetYRowY = y
+        addRenderableWidget(numberField(centerX + 10, y, config.targetY.toString()) { text ->
+            text.toIntOrNull()?.let { config = config.copy(targetY = it) }
+        })
         y += 24
 
-        addRenderableWidget(
-            Button.builder(tunnelWidthLabel()) {
-                config = config.copy(tunnelWidth = nextPreset(tunnelWidthPresets, config.tunnelWidth))
-                it.message = tunnelWidthLabel()
-            }.bounds(centerX - 100, y, 200, 20).build()
-        )
+        tunnelWidthRowY = y
+        addRenderableWidget(numberField(centerX + 10, y, config.tunnelWidth.toString()) { text ->
+            text.toIntOrNull()?.let { config = config.copy(tunnelWidth = it.coerceIn(0, 2)) }
+        })
         y += 24
 
         // Slot outil : clic = capture l'item actuellement en main du joueur comme outil de minage.
@@ -85,6 +83,18 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
                 ToolSelection.item = held?.takeUnless { it.isEmpty }?.item
             }.bounds(toolSlotX, toolSlotY, 20, 20).build()
         )
+        y += 24
+
+        // Slot minerai custom : clic = capture le bloc actuellement en main comme "à casser impérativement".
+        oreSlotX = centerX - 100
+        oreSlotY = y
+        addRenderableWidget(
+            Button.builder(Component.empty()) {
+                val held = minecraft?.player?.mainHandItem ?: return@builder
+                val block = Block.byItem(held.item)
+                CustomOreSelection.block = block.takeUnless { it == Blocks.AIR }
+            }.bounds(oreSlotX, oreSlotY, 20, 20).build()
+        )
         y += 32
 
         addRenderableWidget(
@@ -94,14 +104,35 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         )
     }
 
+    /** Champ de texte libre pour une valeur numérique (au lieu d'un bouton qui ne fait que cycler des présélections). */
+    private fun numberField(x: Int, y: Int, initial: String, onChange: (String) -> Unit): EditBox {
+        val box = EditBox(font, x, y, 90, 20, Component.empty())
+        box.value = initial
+        box.setResponder(onChange)
+        return box
+    }
+
     override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
         super.extractRenderState(graphics, mouseX, mouseY, delta)
+
+        val x = width / 2 - 100
+        val white = 0xFFFFFFFF.toInt()
+        graphics.text(font, "Portée :", x, reachRowY + 6, white, true)
+        graphics.text(font, "Blocs/tick :", x, blocksRowY + 6, white, true)
+        graphics.text(font, "Couche Y :", x, targetYRowY + 6, white, true)
+        graphics.text(font, "Largeur tunnel :", x, tunnelWidthRowY + 6, white, true)
 
         val tool = ToolSelection.item
         if (tool != null) {
             graphics.item(ItemStack(tool), toolSlotX + 2, toolSlotY + 2)
         }
-        graphics.text(font, "Outil : ${toolName(tool)}", toolSlotX + 26, toolSlotY + 6, 0xFFFFFFFF.toInt(), true)
+        graphics.text(font, "Outil : ${toolName(tool)}", toolSlotX + 26, toolSlotY + 6, white, true)
+
+        val ore = CustomOreSelection.block
+        if (ore != null) {
+            graphics.item(ItemStack(ore), oreSlotX + 2, oreSlotY + 2)
+        }
+        graphics.text(font, "Bloc obligatoire : ${oreName(ore)}", oreSlotX + 26, oreSlotY + 6, white, true)
     }
 
     override fun onClose() {
@@ -114,11 +145,7 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         minecraft?.gui?.setScreen(parent)
     }
 
-    private fun reachLabel() = Component.literal("Portée : ${config.reach}")
-    private fun blocksLabel() = Component.literal("Blocs/tick : ${config.blocksPerTick}")
     private fun lockYLabel() = Component.literal("Verrouiller le niveau Y : ${if (config.lockYLevel) "Oui" else "Non"}")
-    private fun targetYLabel() = Component.literal("Couche Y : ${config.targetY}")
-    private fun tunnelWidthLabel() = Component.literal("Largeur du tunnel : ${config.tunnelWidth * 2 + 1} bloc(s)")
     private fun patternLabel() = Component.literal("Style : ${patternName(config.pattern)}")
 
     private fun patternName(pattern: MiningPattern) = when (pattern) {
@@ -130,6 +157,11 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
     private fun toolName(tool: Item?): String {
         if (tool == null) return "main (aucun choisi)"
         return BuiltInRegistries.ITEM.getKey(tool).path.replace('_', ' ')
+    }
+
+    private fun oreName(block: Block?): String {
+        if (block == null) return "aucun"
+        return BuiltInRegistries.BLOCK.getKey(block).path.replace('_', ' ')
     }
 
     private fun <T> nextPreset(presets: List<T>, current: T): T {

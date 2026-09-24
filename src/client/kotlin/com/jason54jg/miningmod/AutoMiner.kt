@@ -6,6 +6,7 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 
 /**
@@ -20,7 +21,16 @@ import net.minecraft.world.phys.Vec3
 object AutoMiner {
     private const val WALK_SPEED = 0.2
     private const val MAX_LOOKAHEAD = 6
-    private const val ZIGZAG_SEGMENT_LENGTH = 6
+
+    // En zigzag : longues lignes droites entrecoupées de petits crans latéraux courts,
+    // pour un mouvement doux plutôt que des virages à 90° marqués.
+    private const val ZIGZAG_FORWARD_LENGTH = 12
+    private const val ZIGZAG_LATERAL_LENGTH = 2
+
+    // En cercle : des bras assez longs dès le départ et une croissance lente, pour une
+    // spirale qui s'ouvre progressivement au lieu de tourner sur elle-même trop vite.
+    private const val CIRCLE_INITIAL_LENGTH = 8
+    private const val CIRCLE_LEGS_BEFORE_GROWTH = 4
 
     var active = false
         private set
@@ -32,7 +42,7 @@ object AutoMiner {
     private var baseFacing: Direction? = null
     private var currentFacing: Direction? = null
     private var segmentSteps = 0
-    private var segmentLength = ZIGZAG_SEGMENT_LENGTH
+    private var segmentLength = ZIGZAG_FORWARD_LENGTH
     private var zigzagPhase = 0
     private var spiralLegCount = 0
 
@@ -48,7 +58,7 @@ object AutoMiner {
             baseFacing = player?.direction
             currentFacing = baseFacing
             segmentSteps = 0
-            segmentLength = if (config.pattern == MiningPattern.CIRCLE) 1 else ZIGZAG_SEGMENT_LENGTH
+            segmentLength = if (config.pattern == MiningPattern.CIRCLE) CIRCLE_INITIAL_LENGTH else ZIGZAG_FORWARD_LENGTH
             zigzagPhase = 0
             spiralLegCount = 0
         } else {
@@ -152,7 +162,7 @@ object AutoMiner {
 
         val ores = path
             .flatMap { pos -> Direction.values().map(pos::relative) }
-            .filter { pos -> pos !in path && OreBlocks.isOre(level.getBlockState(pos)) }
+            .filter { pos -> pos !in path && isPriorityOre(level.getBlockState(pos)) }
             .distinct()
 
         val current = target?.takeIf { isBreakable(level, it) }
@@ -195,8 +205,14 @@ object AutoMiner {
 
         gameMode.stopDestroyBlock()
         target = null
-        MiningStats.recordBreak(brokenState, OreBlocks.isOre(brokenState))
+        MiningStats.recordBreak(brokenState, isPriorityOre(brokenState))
         return true
+    }
+
+    /** Minerai vanilla/tag, ou bloc custom désigné par le joueur comme "à casser impérativement". */
+    private fun isPriorityOre(state: BlockState): Boolean {
+        if (OreBlocks.isOre(state)) return true
+        return state.block == CustomOreSelection.block
     }
 
     private fun advance(player: LocalPlayer, level: Level, immediate: List<BlockPos>, facing: Direction) {
@@ -230,11 +246,12 @@ object AutoMiner {
                     3 -> forward.counterClockWise
                     else -> forward
                 }
+                segmentLength = if (zigzagPhase % 2 == 0) ZIGZAG_FORWARD_LENGTH else ZIGZAG_LATERAL_LENGTH
             }
             MiningPattern.CIRCLE -> {
                 currentFacing = facing.clockWise
                 spiralLegCount++
-                if (spiralLegCount >= 2) {
+                if (spiralLegCount >= CIRCLE_LEGS_BEFORE_GROWTH) {
                     spiralLegCount = 0
                     segmentLength++
                 }

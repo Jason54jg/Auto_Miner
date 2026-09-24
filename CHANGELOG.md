@@ -2,6 +2,13 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.18
+- Config : `Portée`, `Blocs/tick`, `Couche Y` et `Largeur du tunnel` sont maintenant des champs de texte libres (n'importe quelle valeur), au lieu de boutons qui ne faisaient que cycler entre quelques présélections.
+- Nouveau : slot "Bloc obligatoire" dans la config — clique dessus en tenant le bloc en main pour désigner un bloc custom (en plus des minerais vanilla) qui doit impérativement être cassé s'il touche le tunnel. Utile sur un serveur moddé avec ses propres blocs de ressource. Non persisté (comme le slot outil).
+- Nouvelle touche `key.miningmod.ungrab` (par défaut `N`) : libère/reprend la souris, pour éviter qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille.
+- Zigzag retravaillé : lignes droites longues (12 blocs) entrecoupées de petits crans latéraux courts (2 blocs) au lieu d'alterner symétriquement 6 blocs tout droit / 6 blocs à 90°. Mouvement bien plus doux, sans partir complètement à droite ou à gauche.
+- Cercle retravaillé : bras de spirale plus longs dès le départ et qui grandissent plus lentement, pour une spirale qui s'ouvre progressivement au lieu de tourner sur elle-même très vite au début.
+
 ## 0.0.17
 - `Verrouiller le niveau Y` a maintenant une vraie valeur associée : `Couche Y` dans la config (présélections : -59, -54, -32, 0, 11, 15, 63), au lieu de juste figer la hauteur où le joueur se trouvait au moment de l'activation.
 - Descente automatique vers la couche choisie avant de creuser à l'horizontale : casse le bloc sous les pieds, attend d'avoir atterri, recommence — jusqu'à atteindre la couche configurée. S'arrête net sur un bloc incassable ou un liquide. **Ce n'est pas du vrai pathfinding** (pas de contournement d'obstacles), juste une descente verticale contrôlée.

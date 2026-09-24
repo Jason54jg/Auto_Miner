@@ -1,4 +1,5 @@
 {
-	"key.categories.miningmod": "Mining Mod",
-	"key.miningmod.toggle": "Toggle auto-tunnel"
+	"key.categories.miningmod.main": "Mining Mod",
+	"key.miningmod.toggle": "Toggle auto-tunnel",
+	"key.miningmod.ungrab": "Release/Grab mouse"
 }
