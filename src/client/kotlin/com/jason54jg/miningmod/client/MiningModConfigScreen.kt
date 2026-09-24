@@ -91,7 +91,7 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
 
         val tool = ToolSelection.item
         if (tool != null) {
-            graphics.renderItem(ItemStack(tool), toolSlotX + 2, toolSlotY + 2)
+            graphics.item(ItemStack(tool), toolSlotX + 2, toolSlotY + 2)
         }
         graphics.text(font, "Outil : ${toolName(tool)}", toolSlotX + 26, toolSlotY + 6, 0xFFFFFFFF.toInt(), true)
     }

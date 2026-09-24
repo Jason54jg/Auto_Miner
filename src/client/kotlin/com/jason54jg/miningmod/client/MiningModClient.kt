@@ -16,8 +16,9 @@ import org.lwjgl.glfw.GLFW
 
 object MiningModClient : ClientModInitializer {
     override fun onInitializeClient() {
+        val category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("miningmod", "main"))
         val toggleKey = KeyBindingHelper.registerKeyBinding(
-            KeyMapping("key.miningmod.toggle", GLFW.GLFW_KEY_B, "key.categories.miningmod")
+            KeyMapping("key.miningmod.toggle", GLFW.GLFW_KEY_B, category)
         )
 
         ClientTickEvents.END_CLIENT_TICK.register { client ->
@@ -43,10 +44,10 @@ object MiningModClient : ClientModInitializer {
             AlertManager.checkMention(Minecraft.getInstance(), message)
         }
 
-        HudElementRegistry.addLast(Identifier.of("miningmod", "mining_hud")) { graphics, _ ->
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("miningmod", "mining_hud")) { graphics, _ ->
             MiningHud.render(graphics)
         }
-        HudElementRegistry.addLast(Identifier.of("miningmod", "alert_flash")) { graphics, _ ->
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("miningmod", "alert_flash")) { graphics, _ ->
             ScreenFlash.render(graphics)
         }
 

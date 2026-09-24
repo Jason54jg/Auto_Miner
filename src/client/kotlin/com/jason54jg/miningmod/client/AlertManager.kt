@@ -2,9 +2,9 @@ package com.jason54jg.miningmod.client
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundEvents
-import net.minecraft.sounds.SoundSource
 import net.minecraft.world.phys.Vec3
 
 /**
@@ -33,7 +33,7 @@ object AlertManager {
     }
 
     private fun trigger(client: Minecraft) {
-        client.player?.playNotifySound(SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1f, 1f)
+        client.soundManager.play(SimpleSoundInstance.forUI(SoundEvents.EXPERIENCE_ORB_PICKUP, 1f))
         ScreenFlash.start()
     }
 }

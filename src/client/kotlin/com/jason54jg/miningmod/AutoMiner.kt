@@ -84,10 +84,10 @@ object AutoMiner {
     private fun ensureToolEquipped(player: LocalPlayer) {
         val tool = ToolSelection.item ?: return
         val inventory = player.inventory
-        if (inventory.getItem(inventory.selected).item == tool) return
+        if (inventory.getItem(inventory.selectedSlot()).item == tool) return
         for (slot in 0 until 9) {
             if (inventory.getItem(slot).item == tool) {
-                inventory.selected = slot
+                inventory.setSelectedSlot(slot)
                 return
             }
         }
