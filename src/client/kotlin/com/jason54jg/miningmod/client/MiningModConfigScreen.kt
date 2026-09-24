@@ -1,0 +1,119 @@
+package com.jason54jg.miningmod.client
+
+import com.jason54jg.miningmod.AutoMiner
+import com.jason54jg.miningmod.MiningModConfig
+import com.jason54jg.miningmod.MiningPattern
+import com.jason54jg.miningmod.ToolSelection
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+
+class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.literal("Mining Mod")) {
+    private var config = MiningModConfig.load()
+
+    private val reachPresets = listOf(4.5, 8.0, 16.0, 32.0)
+    private val blocksPerTickPresets = listOf(1, 2, 4, 8)
+    private val patternPresets = MiningPattern.values().toList()
+
+    private var toolSlotX = 0
+    private var toolSlotY = 0
+
+    override fun init() {
+        val centerX = width / 2
+        var y = height / 2 - 86
+
+        addRenderableWidget(
+            Button.builder(reachLabel()) {
+                config = config.copy(reach = nextPreset(reachPresets, config.reach))
+                it.message = reachLabel()
+            }.bounds(centerX - 100, y, 200, 20).build()
+        )
+        y += 24
+
+        addRenderableWidget(
+            Button.builder(blocksLabel()) {
+                config = config.copy(blocksPerTick = nextPreset(blocksPerTickPresets, config.blocksPerTick))
+                it.message = blocksLabel()
+            }.bounds(centerX - 100, y, 200, 20).build()
+        )
+        y += 24
+
+        addRenderableWidget(
+            Button.builder(patternLabel()) {
+                config = config.copy(pattern = nextPreset(patternPresets, config.pattern))
+                it.message = patternLabel()
+            }.bounds(centerX - 100, y, 200, 20).build()
+        )
+        y += 24
+
+        addRenderableWidget(
+            Button.builder(lockYLabel()) {
+                config = config.copy(lockYLevel = !config.lockYLevel)
+                it.message = lockYLabel()
+            }.bounds(centerX - 100, y, 200, 20).build()
+        )
+        y += 24
+
+        // Slot outil : clic = capture l'item actuellement en main du joueur comme outil de minage.
+        toolSlotX = centerX - 100
+        toolSlotY = y
+        addRenderableWidget(
+            Button.builder(Component.empty()) {
+                val held = minecraft?.player?.mainHandItem
+                ToolSelection.item = held?.takeUnless { it.isEmpty }?.item
+            }.bounds(toolSlotX, toolSlotY, 20, 20).build()
+        )
+        y += 32
+
+        addRenderableWidget(
+            Button.builder(Component.literal("Terminé")) { onDone() }
+                .bounds(centerX - 100, y, 200, 20)
+                .build()
+        )
+    }
+
+    override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta)
+
+        val tool = ToolSelection.item
+        if (tool != null) {
+            graphics.renderItem(ItemStack(tool), toolSlotX + 2, toolSlotY + 2)
+        }
+        graphics.text(font, "Outil : ${toolName(tool)}", toolSlotX + 26, toolSlotY + 6, 0xFFFFFFFF.toInt(), true)
+    }
+
+    override fun onClose() {
+        onDone()
+    }
+
+    private fun onDone() {
+        MiningModConfig.save(config)
+        AutoMiner.applyConfig(config)
+        minecraft?.gui?.setScreen(parent)
+    }
+
+    private fun reachLabel() = Component.literal("Portée : ${config.reach}")
+    private fun blocksLabel() = Component.literal("Blocs/tick : ${config.blocksPerTick}")
+    private fun lockYLabel() = Component.literal("Verrouiller le niveau Y : ${if (config.lockYLevel) "Oui" else "Non"}")
+    private fun patternLabel() = Component.literal("Style : ${patternName(config.pattern)}")
+
+    private fun patternName(pattern: MiningPattern) = when (pattern) {
+        MiningPattern.STRAIGHT -> "Tout droit"
+        MiningPattern.ZIGZAG -> "Zigzag (gauche/droite)"
+        MiningPattern.CIRCLE -> "Cercle (spirale)"
+    }
+
+    private fun toolName(tool: Item?): String {
+        if (tool == null) return "main (aucun choisi)"
+        return BuiltInRegistries.ITEM.getKey(tool).path.replace('_', ' ')
+    }
+
+    private fun <T> nextPreset(presets: List<T>, current: T): T {
+        val index = presets.indexOf(current)
+        return presets[(index + 1).mod(presets.size)]
+    }
+}

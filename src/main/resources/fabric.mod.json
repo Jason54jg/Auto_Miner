@@ -1,0 +1,45 @@
+{
+	"schemaVersion": 1,
+	"id": "miningmod",
+	"version": "${version}",
+	"name": "Mining Mod",
+	"description": "Mine et avance tout droit automatiquement en maintenant une touche, en cassant systématiquement les minerais rencontrés autour du tunnel.",
+	"authors": [
+		"Jason54jg"
+	],
+	"contact": {
+		"sources": "https://github.com/jason54jg/miningmod"
+	},
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			{
+				"adapter": "kotlin",
+				"value": "com.jason54jg.miningmod.MiningMod"
+			}
+		],
+		"client": [
+			{
+				"adapter": "kotlin",
+				"value": "com.jason54jg.miningmod.client.MiningModClient"
+			}
+		],
+		"modmenu": [
+			{
+				"adapter": "kotlin",
+				"value": "com.jason54jg.miningmod.client.MiningModMenuIntegration"
+			}
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*",
+		"fabric-language-kotlin": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}
