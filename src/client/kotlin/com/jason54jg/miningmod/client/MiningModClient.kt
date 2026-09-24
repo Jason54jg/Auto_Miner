@@ -26,10 +26,13 @@ object MiningModClient : ClientModInitializer {
         )
 
         ClientTickEvents.END_CLIENT_TICK.register { client ->
-            while (toggleKey.consumeClick()) AutoMiner.toggle(client)
+            while (toggleKey.consumeClick()) {
+                AutoMiner.toggle(client)
+                if (AutoMiner.active) AlertManager.resetTeleportTracking()
+            }
             while (ungrabKey.consumeClick()) toggleMouseGrab(client)
             AutoMiner.tick(client)
-            client.player?.let(AlertManager::checkTeleport)
+            if (AutoMiner.active) client.player?.let(AlertManager::checkTeleport)
         }
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
@@ -42,7 +45,7 @@ object MiningModClient : ClientModInitializer {
         }
 
         ClientReceiveMessageEvents.CHAT.register { message, _, _, _, _ ->
-            AlertManager.checkMention(Minecraft.getInstance(), message)
+            if (AutoMiner.active) AlertManager.checkMention(Minecraft.getInstance(), message)
         }
 
         HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("miningmod", "mining_hud")) { graphics, _ ->

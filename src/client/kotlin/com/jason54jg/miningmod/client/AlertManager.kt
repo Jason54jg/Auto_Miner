@@ -16,6 +16,11 @@ object AlertManager {
 
     private var lastPosition: Vec3? = null
 
+    /** À appeler à l'activation du minage : évite de comparer à une position d'un autre monde/dimension. */
+    fun resetTeleportTracking() {
+        lastPosition = null
+    }
+
     fun checkTeleport(player: LocalPlayer) {
         val previous = lastPosition
         val current = player.position()

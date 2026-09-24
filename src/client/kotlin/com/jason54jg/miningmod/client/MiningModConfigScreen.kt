@@ -15,6 +15,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.BlockHitResult
 
 class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.literal("Mining Mod")) {
     private var config = MiningModConfig.load()
@@ -85,13 +86,15 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         )
         y += 24
 
-        // Slot minerai custom : clic = capture le bloc actuellement en main comme "à casser impérativement".
+        // Slot minerai custom : clic = capture le bloc visé (regardé juste avant d'ouvrir cet écran)
+        // comme "à casser impérativement". Vise le bloc AVANT d'ouvrir la config avec /miningbot.
         oreSlotX = centerX - 100
         oreSlotY = y
         addRenderableWidget(
             Button.builder(Component.empty()) {
-                val held = minecraft?.player?.mainHandItem ?: return@builder
-                val block = Block.byItem(held.item)
+                val hit = minecraft?.hitResult as? BlockHitResult ?: return@builder
+                val level = minecraft?.level ?: return@builder
+                val block = level.getBlockState(hit.blockPos).block
                 CustomOreSelection.block = block.takeUnless { it == Blocks.AIR }
             }.bounds(oreSlotX, oreSlotY, 20, 20).build()
         )
@@ -132,7 +135,7 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         if (ore != null) {
             graphics.item(ItemStack(ore), oreSlotX + 2, oreSlotY + 2)
         }
-        graphics.text(font, "Bloc obligatoire : ${oreName(ore)}", oreSlotX + 26, oreSlotY + 6, white, true)
+        graphics.text(font, "Bloc obligatoire (vise-le avant d'ouvrir) : ${oreName(ore)}", oreSlotX + 26, oreSlotY + 6, white, true)
     }
 
     override fun onClose() {

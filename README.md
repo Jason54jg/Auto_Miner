@@ -2,7 +2,7 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.18** (voir [CHANGELOG.md](CHANGELOG.md))
+Version actuelle : **0.0.20** (voir [CHANGELOG.md](CHANGELOG.md))
 
 ## Fonctionnalités
 
@@ -19,9 +19,9 @@ Version actuelle : **0.0.18** (voir [CHANGELOG.md](CHANGELOG.md))
   - `Blocs/tick` : nombre de blocs pouvant être cassés en un seul tick (utile avec haste/efficacité ou une capacité de casse instantanée multiple) ;
   - `Verrouiller le niveau Y` + `Couche Y` : le tunnel reste à la hauteur choisie plutôt qu'à celle où le minage a été activé. Le mod descend automatiquement (casse le bloc sous les pieds, attend d'atterrir, recommence) jusqu'à cette couche avant de creuser à l'horizontale — pas un vrai pathfinding, juste une descente verticale, qui s'arrête net sur un bloc incassable ou un liquide.
   - `Largeur du tunnel` : élargit la zone minée latéralement (utile avec un outil qui a son propre effet de zone, ou juste pour creuser plus large).
-  - **Slot "Bloc obligatoire"** : clique dessus en tenant un bloc en main pour désigner un bloc custom (en plus des minerais vanilla) qui doit impérativement être cassé s'il touche le tunnel. Utile sur un serveur moddé avec ses propres blocs de ressource. Choix en mémoire seulement (comme le slot outil).
+  - **Slot "Bloc obligatoire"** : vise le bloc voulu dans le monde, puis ouvre `/miningbot` et clique sur le slot — désigne ce bloc custom (en plus des minerais vanilla) comme à casser impérativement s'il touche le tunnel. Utile sur un serveur moddé avec ses propres blocs de ressource. Choix en mémoire seulement (comme le slot outil).
   - Réglages sauvegardés dans `config/miningmod.json` (sauf le slot outil et le bloc obligatoire, volontairement non persistés).
-- **Alertes téléportation/mention** : un son (ding) et un flash rouge de l'écran pendant 3 secondes se déclenchent si :
+- **Alertes téléportation/mention** (actives uniquement pendant que le minage tourne) : un son (ding) et un flash rouge de l'écran pendant 3 secondes se déclenchent si :
   - le joueur se déplace de façon anormale en un seul tick (téléportation, TP admin, etc.) ;
   - le pseudo du joueur apparaît dans un message de chat reçu (mention).
 - **Style de minage** (`pattern` dans la config) :

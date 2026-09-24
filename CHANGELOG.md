@@ -2,6 +2,12 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.20
+- Slot "Bloc obligatoire" : capture maintenant le bloc **visé** (regardé juste avant d'ouvrir la config) plutôt que l'objet en main. Vise le bloc voulu, puis ouvre `/miningbot` et clique sur le slot.
+
+## 0.0.19
+- Fix alertes téléportation/mention : elles tournaient en permanence, même sans minage actif. Un changement de monde/dimension déclenchait une fausse alerte "téléportation" (la position d'avant, dans un autre monde, n'a aucun rapport avec la nouvelle). Les alertes ne se déclenchent maintenant que pendant que le minage est actif, et le suivi de position repart à zéro à chaque activation.
+
 ## 0.0.18
 - Config : `Portée`, `Blocs/tick`, `Couche Y` et `Largeur du tunnel` sont maintenant des champs de texte libres (n'importe quelle valeur), au lieu de boutons qui ne faisaient que cycler entre quelques présélections.
 - Nouveau : slot "Bloc obligatoire" dans la config — clique dessus en tenant le bloc en main pour désigner un bloc custom (en plus des minerais vanilla) qui doit impérativement être cassé s'il touche le tunnel. Utile sur un serveur moddé avec ses propres blocs de ressource. Non persisté (comme le slot outil).
