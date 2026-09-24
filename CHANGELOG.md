@@ -2,6 +2,9 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.32
+- Message dans le chat à chaque appui sur la touche d'activation ("Minage automatique activé"/"désactivé") — s'affiche aussi quand le minage se coupe tout seul sur obstacle (0.0.30).
+
 ## 0.0.31
 - L'esquive de trou (saut ou arrêt) ne s'applique plus que si `Verrouiller le niveau Y` est actif. Sans verrouillage, pas de couche à maintenir : le bot ignore les trous et tombe dedans en continuant d'avancer, tout en cassant normalement le bloc devant lui s'il y en a un.
 

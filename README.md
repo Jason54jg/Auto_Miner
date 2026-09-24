@@ -2,11 +2,11 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.31** (voir [CHANGELOG.md](CHANGELOG.md))
+Version actuelle : **0.0.32** (voir [CHANGELOG.md](CHANGELOG.md))
 
 ## Fonctionnalités
 
-- Touche **B** (rebindable dans les options du jeu) pour activer/désactiver le minage automatique.
+- Touche **B** (rebindable dans les options du jeu) pour activer/désactiver le minage automatique — un message dans le chat confirme à chaque fois ("Minage automatique activé"/"désactivé").
 - Une fois activé, le mod :
   - casse les blocs devant le joueur (pieds + tête), dans la direction figée au moment de l'activation ;
   - fait avancer le joueur dans le tunnel une fois celui-ci dégagé ;
