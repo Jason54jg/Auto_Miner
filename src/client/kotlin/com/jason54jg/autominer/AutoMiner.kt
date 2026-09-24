@@ -1,6 +1,6 @@
-package com.jason54jg.miningmod
+package com.jason54jg.autominer
 
-import com.jason54jg.miningmod.client.AlertManager
+import com.jason54jg.autominer.client.AlertManager
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.MultiPlayerGameMode
@@ -33,14 +33,14 @@ object AutoMiner {
     var active = false
         private set
 
-    private var config = MiningModConfig.load()
+    private var config = AutoMinerModConfig.load()
     private var target: BlockPos? = null
     private var stuckTicks = 0
 
     // Direction figée à l'activation : jamais celle du regard en direct.
     private var baseFacing: Direction? = null
 
-    fun applyConfig(newConfig: MiningModConfig) {
+    fun applyConfig(newConfig: AutoMinerModConfig) {
         config = newConfig
     }
 
@@ -99,7 +99,7 @@ object AutoMiner {
 
     /**
      * Descend tout droit (casse le bloc sous les pieds, attend d'atterrir) jusqu'à la couche
-     * [MiningModConfig.targetY]. Ce n'est pas du vrai pathfinding : juste une descente verticale,
+     * [AutoMinerModConfig.targetY]. Ce n'est pas du vrai pathfinding : juste une descente verticale,
      * qui s'arrête net si elle tombe sur un bloc incassable ou un liquide.
      *
      * @return vrai tant que la descente n'est pas terminée (le tunnel horizontal doit attendre).

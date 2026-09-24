@@ -1,148 +1,156 @@
 # Changelog
 
-Chaque nouvelle demande incrémente la version de `0.0.1`.
+*English | [Français](CHANGELOG.fr.md)*
+
+Each new request bumps the version by `0.0.1`.
+
+## 0.0.39
+- Bilingual documentation: `README.md`/`CHANGELOG.md` in English (base language), `README.fr.md`/`CHANGELOG.fr.md` in French.
+
+## 0.0.38
+- **Full rename**: `Mining Mod` → `Auto Miner`. Technical id `miningmod` → `autominer`, package `com.jason54jg.miningmod` → `com.jason54jg.autominer`, command `/miningbot` → `/autominer`, config file `miningmod.json` → `autominer.json`, translation keys `key.miningmod.*` → `key.autominer.*`. Old settings (`config/miningmod.json`) are not carried over automatically — fresh default config on first launch.
 
 ## 0.0.37
-- Fix : le mod cassait le bloc au niveau des pieds avant celui à hauteur de tête, alors que le viseur (caméra à niveau) pointe la tête — donnait l'impression de casser "en bas" au lieu de "devant". La tête est maintenant cassée en priorité.
+- Fix: the mod broke the block at feet level before the one at head height, even though the crosshair (camera held level) points at the head — gave the impression of breaking "below" instead of "in front". The head is now broken first.
 
 ## 0.0.36
-- Message chat d'activation/désactivation coloré (vert/rouge) au lieu de blanc.
-- HUD de minage déplaçable : `Position HUD X`/`Position HUD Y` dans `/miningbot` (position en pixels, coin haut-gauche du panneau, sauvegardée dans la config).
+- Colored activation/deactivation chat message (green/red) instead of white.
+- Movable mining HUD: `HUD position X`/`HUD position Y` in `/miningbot` (position in pixels, top-left corner of the panel, saved in the config).
 
 ## 0.0.35
-- En vol (créatif/spectateur), le bot n'attend plus un sol sous les pieds pour avancer : l'esquive de trou (réservée à `Verrouiller le niveau Y`) est ignorée pendant le vol, puisqu'un joueur qui vole ne tombe pas.
+- While flying (creative/spectator), the bot no longer waits for a floor underfoot to advance: hole avoidance (reserved for `Lock Y level`) is ignored while flying, since a flying player doesn't fall.
 
 ## 0.0.34
-- Suppression des styles Zigzag et Cercle : le mod ne mine plus qu'en ligne droite (direction figée à l'activation, comme avant). Le champ `pattern` disparaît de la config, le bouton "Style" de l'écran `/miningbot` aussi.
+- Removed the Zigzag and Circle styles: the mod now only mines in a straight line (direction locked at activation, as before). The `pattern` field disappears from the config, as does the "Style" button on the `/miningbot` screen.
 
 ## 0.0.33
-- Fix compile : `Player.displayClientMessage(Component, Boolean)` a disparu en 26.2, scindé en `sendSystemMessage(Component)` (chat) et `sendOverlayMessage(Component)` (action bar). Le message d'activation/désactivation utilise maintenant `sendSystemMessage`.
+- Compile fix: `Player.displayClientMessage(Component, Boolean)` was removed in 26.2, split into `sendSystemMessage(Component)` (chat) and `sendOverlayMessage(Component)` (action bar). The activation/deactivation message now uses `sendSystemMessage`.
 
 ## 0.0.32
-- Message dans le chat à chaque appui sur la touche d'activation ("Minage automatique activé"/"désactivé") — s'affiche aussi quand le minage se coupe tout seul sur obstacle (0.0.30).
+- Chat message on every press of the activation key ("Auto-mining enabled"/"disabled") — also shown when mining shuts itself off on an obstacle (0.0.30).
 
 ## 0.0.31
-- L'esquive de trou (saut ou arrêt) ne s'applique plus que si `Verrouiller le niveau Y` est actif. Sans verrouillage, pas de couche à maintenir : le bot ignore les trous et tombe dedans en continuant d'avancer, tout en cassant normalement le bloc devant lui s'il y en a un.
+- Hole avoidance (jump or stop) now only applies if `Lock Y level` is active. Without the lock, there's no layer to maintain: the bot ignores holes and falls into them while continuing to advance, while still breaking the block in front of it normally if there is one.
 
 ## 0.0.30
-- Fix : face à un obstacle réel (bloc incassable, liquide sans minerai autour, trou trop large sans minerai), le mod restait actif mais ne faisait plus rien du tout, en silence, indéfiniment. Après 20 ticks (~1s) sans casser ni avancer, le minage se coupe automatiquement et alerte le joueur (son + flash), comme pour une téléportation/mention.
+- Fix: facing a real obstacle (unbreakable block, liquid with no ore around, hole too wide with no ore), the mod stayed active but did nothing at all, silently, indefinitely. After 20 ticks (~1s) without breaking or advancing, mining now shuts off automatically and alerts the player (sound + flash), like for a teleport/mention.
 
 ## 0.0.29
-- Fix important : le mod pouvait casser le bloc qui porte le joueur (minerai/bloc obligatoire détecté juste sous les pieds), le faisant tomber dans le vide/une caverne — surtout depuis le scan large du bloc obligatoire. Ce bloc est maintenant systématiquement exclu des cibles.
-- Fix caméra : la tête ne suivait plus la direction figée pendant une descente Y (ou une chute) — `syncViewToFacing` tourne maintenant à chaque tick, plus seulement quand la descente est terminée.
+- Important fix: the mod could break the block holding the player up (ore/mandatory block detected right underfoot), making them fall into the void/a cave — especially from the mandatory block's wide scan. This block is now systematically excluded from targets.
+- Camera fix: the head no longer followed the locked direction during a Y descent (or a fall) — `syncViewToFacing` now runs every tick, not only once the descent is finished.
 
 ## 0.0.28
-- Le scan large (cube autour du joueur, toutes directions) est maintenant réservé au **bloc obligatoire**. Les minerais vanilla/tag reviennent à l'ancien comportement "touche le tunnel" — sinon un minerai croisé dans un mur à distance trouait le tunnel au hasard. Pas de scan du tout si aucun bloc obligatoire n'est choisi (évite le coût du cube pour rien).
+- The wide scan (cube around the player, all directions) is now reserved for the **mandatory block**. Vanilla/tag ores go back to the old "touches the tunnel" behavior — otherwise an ore crossed at a distance in a wall would randomly punch a hole through the tunnel. No scan at all if no mandatory block is chosen (avoids the cube's cost for nothing).
 
 ## 0.0.27
-- Autonomie complète : la direction de minage/déplacement (tous styles, y compris "Tout droit") est maintenant figée à l'activation et n'est plus jamais lue depuis le regard en direct. La caméra suit automatiquement (fixe en ligne droite, clampée à ±30° en zigzag/cercle) : plus aucun mouvement ni visée du joueur n'est nécessaire une fois le minage lancé.
-- Détection des blocs prioritaires (minerais + bloc obligatoire) : passe d'un scan limité aux blocs touchant le tunnel devant, à un scan en cube autour du joueur (portée = `Portée`), dans toutes les directions — un minerai est cassé en premier dès qu'il est détecté à portée, même sur le côté, au-dessus, en dessous ou derrière.
+- Full autonomy: the mining/movement direction (all styles, including "Straight") is now locked at activation and never read from the live look direction again. The camera follows automatically (fixed in a straight line, clamped to ±30° in zigzag/circle): no player movement or aiming is needed anymore once mining starts.
+- Priority block detection (ores + mandatory block): moves from a scan limited to blocks touching the tunnel ahead, to a cube scan around the player (radius = `Reach`), in every direction — an ore is broken first as soon as it's detected in range, even to the side, above, below or behind.
 
 ## 0.0.26
-- Fix compile : `BuiltInRegistries.BLOCK.get(Identifier)` / `.ITEM.get(Identifier)` renvoient maintenant `Optional<Holder.Reference<T>>?` au lieu de `T?` directement. `ToolSelection.resolve`/`CustomOreSelection.resolve` déballent via `.orElse(null)?.value()`.
+- Compile fix: `BuiltInRegistries.BLOCK.get(Identifier)` / `.ITEM.get(Identifier)` now return `Optional<Holder.Reference<T>>?` instead of `T?` directly. `ToolSelection.resolve`/`CustomOreSelection.resolve` unwrap via `.orElse(null)?.value()`.
 
 ## 0.0.25
-- Fix possible : `isBreakable` excluait tout bloc renvoyant un `fluidState` non vide, ce qui exclut aussi un bloc solide **waterlogged** (un minerai custom immergé, par ex.), pas seulement l'eau/la lave elles-mêmes. Utilise maintenant `state.liquid()` (vrai uniquement pour un bloc de fluide) pour ne plus bloquer un bloc obligatoire/minerai simplement parce qu'il est sous l'eau.
+- Possible fix: `isBreakable` excluded any block reporting a non-empty `fluidState`, which also excludes a solid **waterlogged** block (a submerged custom ore, for example), not just water/lava themselves. Now uses `state.liquid()` (true only for a fluid block) so a mandatory block/ore is no longer blocked just because it's underwater.
 
 ## 0.0.24
-- Trou d'un seul bloc de large devant lui : le bot saute par-dessus au lieu de s'arrêter net. Un trou plus large (pas de sol non plus à l'atterrissage) reste bloquant comme avant (attend/mine plutôt que de tomber).
+- A single-block-wide hole ahead: the bot jumps over it instead of stopping dead. A wider hole (no floor at the landing spot either) stays blocking as before (waits/mines rather than falling).
 
 ## 0.0.23
-- Fix `/miningbot` : la commande n'ouvrait jamais l'écran de config (aucune erreur nulle part). Cause : `ChatScreen` ferme l'écran courant (`setScreen(null)`) juste après l'envoi de la commande, dans le même appel — ça écrasait aussitôt l'écran qu'on venait d'ouvrir depuis `executes`. L'ouverture est maintenant reportée à la tâche client suivante (`Minecraft.execute { ... }`), une fois le chat déjà fermé.
+- Fix `/miningbot`: the command never opened the config screen (no error anywhere). Cause: `ChatScreen` closes the current screen (`setScreen(null)`) right after sending the command, in the same call — that immediately overwrote the screen just opened from `executes`. Opening it is now deferred to the next client task (`Minecraft.execute { ... }`), once the chat is already closed.
 
 ## 0.0.22
-- Caméra en zigzag/cercle : ne tourne plus jamais de plus de 30° par rapport à la direction de départ, même quand le tunnel fait un cran à 90° (le déplacement/minage garde ses angles droits sur la grille de blocs, mais la vue reste dans le champ de vision d'origine). Limite connue : en cercle, une fois la spirale bien engagée, la direction réelle peut s'éloigner de la vue affichée (plafonnée à ±30°) — pas de suivi caméra parfait sur un virage complet.
-- Fix : le bot ne marche plus dans le vide (trou, ravin, mine à ciel ouvert) — vérifie qu'il y a un sol avant d'avancer, sinon il attend/mine au lieu de tomber.
+- Camera in zigzag/circle: never turns more than 30° from the starting direction anymore, even when the tunnel takes a 90° turn (movement/mining keeps its right angles on the block grid, but the view stays within the player's original field of view). Known limitation: in circle mode, once the spiral is well underway, the actual direction can drift away from the displayed view (capped at ±30°) — no perfect camera tracking through a full turn.
+- Fix: the bot no longer walks into thin air (hole, ravine, open-pit mine) — checks there's a floor before advancing, otherwise waits/mines instead of falling.
 
 ## 0.0.21
-- L'outil et le bloc obligatoire survivent maintenant à un redémarrage du jeu (`toolItemId`/`customBlockId` dans `config/miningmod.json`, résolus au chargement). Fix au passage : "Terminé" écrasait la sélection tout juste faite dans les slots avec l'ancienne config chargée à l'ouverture de l'écran — la sauvegarde inclut maintenant la sélection actuelle des slots.
+- The tool and mandatory block now survive a game restart (`toolItemId`/`customBlockId` in `config/miningmod.json`, resolved on load). Fix along the way: "Done" was overwriting the selection just made in the slots with the old config loaded when the screen opened — saving now includes the slots' current selection.
 
 ## 0.0.20
-- Slot "Bloc obligatoire" : capture maintenant le bloc **visé** (regardé juste avant d'ouvrir la config) plutôt que l'objet en main. Vise le bloc voulu, puis ouvre `/miningbot` et clique sur le slot.
+- "Mandatory block" slot: now captures the **targeted** block (looked at just before opening the config) rather than the held item. Aim at the desired block, then open `/miningbot` and click the slot.
 
 ## 0.0.19
-- Fix alertes téléportation/mention : elles tournaient en permanence, même sans minage actif. Un changement de monde/dimension déclenchait une fausse alerte "téléportation" (la position d'avant, dans un autre monde, n'a aucun rapport avec la nouvelle). Les alertes ne se déclenchent maintenant que pendant que le minage est actif, et le suivi de position repart à zéro à chaque activation.
+- Fix teleport/mention alerts: they ran constantly, even without mining active. A world/dimension change triggered a false "teleport" alert (the previous position, in another world, has nothing to do with the new one). Alerts now only trigger while mining is active, and position tracking resets on every activation.
 
 ## 0.0.18
-- Config : `Portée`, `Blocs/tick`, `Couche Y` et `Largeur du tunnel` sont maintenant des champs de texte libres (n'importe quelle valeur), au lieu de boutons qui ne faisaient que cycler entre quelques présélections.
-- Nouveau : slot "Bloc obligatoire" dans la config — clique dessus en tenant le bloc en main pour désigner un bloc custom (en plus des minerais vanilla) qui doit impérativement être cassé s'il touche le tunnel. Utile sur un serveur moddé avec ses propres blocs de ressource. Non persisté (comme le slot outil).
-- Nouvelle touche `key.miningmod.ungrab` (par défaut `N`) : libère/reprend la souris, pour éviter qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille.
-- Zigzag retravaillé : lignes droites longues (12 blocs) entrecoupées de petits crans latéraux courts (2 blocs) au lieu d'alterner symétriquement 6 blocs tout droit / 6 blocs à 90°. Mouvement bien plus doux, sans partir complètement à droite ou à gauche.
-- Cercle retravaillé : bras de spirale plus longs dès le départ et qui grandissent plus lentement, pour une spirale qui s'ouvre progressivement au lieu de tourner sur elle-même très vite au début.
+- Config: `Reach`, `Blocks/tick`, `Y level` and `Tunnel width` are now free-text fields (any value), instead of buttons that only cycled through a few presets.
+- New: "Mandatory block" slot in the config — click it while holding the block to designate a custom block (in addition to vanilla ores) that must imperatively be broken if it touches the tunnel. Useful on a modded server with its own resource blocks. Not persisted (like the tool slot).
+- New `key.miningmod.ungrab` key (`N` by default): releases/regrabs the mouse, to prevent an unintentional mouse movement from turning the camera (and therefore the mining direction) while the bot is working.
+- Reworked zigzag: long straight lines (12 blocks) interspersed with short lateral jogs (2 blocks) instead of symmetrically alternating 6 blocks straight / 6 blocks at 90°. Much smoother movement, without ever going fully left or right.
+- Reworked circle: spiral arms are longer from the start and grow more slowly, for a spiral that opens up progressively instead of turning very tight at the beginning.
 
 ## 0.0.17
-- `Verrouiller le niveau Y` a maintenant une vraie valeur associée : `Couche Y` dans la config (présélections : -59, -54, -32, 0, 11, 15, 63), au lieu de juste figer la hauteur où le joueur se trouvait au moment de l'activation.
-- Descente automatique vers la couche choisie avant de creuser à l'horizontale : casse le bloc sous les pieds, attend d'avoir atterri, recommence — jusqu'à atteindre la couche configurée. S'arrête net sur un bloc incassable ou un liquide. **Ce n'est pas du vrai pathfinding** (pas de contournement d'obstacles), juste une descente verticale contrôlée.
-- `Largeur du tunnel` dans la config (1/3/5 blocs) : élargit la zone minée latéralement, utile avec un outil qui a son propre effet de zone (ex. un enchantement "Excavation" côté serveur) ou simplement pour creuser plus large.
-- Refactor interne : la logique de casse d'un bloc (démarrer/continuer/confirmer) est maintenant partagée entre le tunnel horizontal et la descente verticale (`AutoMiner.breakBlock`).
+- `Lock Y level` now has a real associated value: `Y level` in the config (presets: -59, -54, -32, 0, 11, 15, 63), instead of just freezing the height the player was at when activating.
+- Automatic descent to the chosen layer before digging horizontally: breaks the block underfoot, waits to land, repeats — until reaching the configured layer. Stops dead on an unbreakable block or a liquid. **This is not real pathfinding** (no obstacle avoidance), just a controlled vertical descent.
+- `Tunnel width` in the config (1/3/5 blocks): widens the mined area sideways, useful with a tool that has its own area effect (e.g. a server-side "Excavation" enchantment) or simply to dig wider.
+- Internal refactor: the logic for breaking a block (start/continue/confirm) is now shared between the horizontal tunnel and the vertical descent (`AutoMiner.breakBlock`).
 
 ## 0.0.16
-- Fix minage : le minage ne se fiait qu'à la valeur de retour de `startDestroyBlock`/`continueDestroyBlock` pour savoir si un bloc était cassé (compteur HUD incrémenté, animation de bras, mais rien ne cassait réellement). Vérifie maintenant l'état réel du bloc (`isAir`) après chaque appel, quelle que soit la sémantique exacte du retour.
-- Commande : `/miningmod config` → `/miningbot` (commande directe, plus de sous-commande `config`).
-- Zigzag/cercle : le joueur tourne maintenant la tête et le corps pour suivre la direction pilotée par le mod (avant, seuls le déplacement et le minage tournaient, pas la caméra).
+- Mining fix: mining only relied on the return value of `startDestroyBlock`/`continueDestroyBlock` to know whether a block was broken (HUD counter incremented, arm animation, but nothing actually broke). Now checks the real block state (`isAir`) after each call, regardless of the exact semantics of the return value.
+- Command: `/miningmod config` → `/miningbot` (direct command, no more `config` subcommand).
+- Zigzag/circle: the player's head and body now turn to follow the direction driven by the mod (before, only movement and mining turned, not the camera).
 
 ## 0.0.15
-- **X-ray entièrement supprimé** (fichiers, config, écran, appels) : `XrayRenderer.kt`, `XrayScanner.kt` supprimés ; `XrayPreset` et le champ `xrayPreset` retirés de la config ; bouton et libellé retirés de l'écran de configuration ; `OreBlocks.VALUABLE` retiré (n'était utilisé que par le x-ray, `OreBlocks.ALL` reste utilisé par le minage auto).
+- **X-ray fully removed** (files, config, screen, calls): `XrayRenderer.kt`, `XrayScanner.kt` deleted; `XrayPreset` and the `xrayPreset` field removed from the config; button and label removed from the config screen; `OreBlocks.VALUABLE` removed (was only used by x-ray, `OreBlocks.ALL` is still used by auto-mining).
 
 ## 0.0.14
-- **X-ray abandonné.** Construire un `RenderPipeline` personnalisé en 26.2 demande d'écrire ses propres shaders (`.withVertexShader`/`.withFragmentShader`) et de déclarer des `BindGroupLayout` (matrices de projection, etc.) — plus aucun snippet tout fait pour du simple position+couleur. Trop profond pour être fiable sans compilateur sous la main. `XrayRenderer.kt` est maintenant un stub qui ne dessine rien.
-- `XrayScanner` (scan des minerais en config) et le réglage "Voir à travers les murs" restent en place, inertes, prêts pour une vraie implémentation future si quelqu'un a une référence concrète de pipeline 26.2 fonctionnel.
+- **X-ray abandoned.** Building a custom `RenderPipeline` on 26.2 requires writing your own shaders (`.withVertexShader`/`.withFragmentShader`) and declaring a `BindGroupLayout` (projection matrices, etc.) — no more ready-made snippet for simple position+color. Too deep to be reliable without a compiler on hand. `XrayRenderer.kt` is now a stub that draws nothing.
+- `XrayScanner` (ore scanning in the config) and the "See through walls" setting stay in place, inert, ready for a real implementation in the future if someone has a concrete, working 26.2 pipeline reference.
 
 ## 0.0.13
-- Fix build (x-ray) : `RenderType` a déménagé de `net.minecraft.client.renderer` vers `net.minecraft.client.renderer.rendertype` en 26.2. Confirmé par recherche croisée (primer NeoForge). Reste très probablement d'autres soucis dans `XrayRenderer.kt` : la refonte de `RenderType` va bien plus loin qu'un simple déplacement de package (`RenderType#draw` remplacé par `PreparedRenderType#drawFromBuffer`, `RenderType#create` pas encore vérifié pour 26.2).
+- Build fix (x-ray): `RenderType` moved from `net.minecraft.client.renderer` to `net.minecraft.client.renderer.rendertype` on 26.2. Confirmed by cross-checking (NeoForge primer). Very likely other issues remain in `XrayRenderer.kt`: the `RenderType` rework goes well beyond a simple package move (`RenderType#draw` replaced by `PreparedRenderType#drawFromBuffer`, `RenderType#create` not yet verified for 26.2).
 
 ## 0.0.12
-- Fix build : module Fabric API renommé `fabric-key-binding-api-v1` → `fabric-key-mapping-api-v1` sur 26.2 (suit le renommage `KeyBinding`→`KeyMapping` côté Minecraft). `KeyBindingHelper.registerKeyBinding` → `net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper.registerKeyMapping`. Confirmé en regardant le code source de Fabric API sur la branche 26.2.
+- Build fix: Fabric API module renamed `fabric-key-binding-api-v1` → `fabric-key-mapping-api-v1` on 26.2 (follows the `KeyBinding`→`KeyMapping` rename on the Minecraft side). `KeyBindingHelper.registerKeyBinding` → `net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper.registerKeyMapping`. Confirmed by looking at Fabric API's source on the 26.2 branch.
 
 ## 0.0.11
-- Fix build : `ClientCommandManager` a été supprimé de Fabric API sur 26.2, remplacé par `ClientCommands` (même méthode `literal(...)`). Confirmé en regardant directement le code source de Fabric API sur la branche 26.2 (le fichier `ClientCommandManager.java` n'existe plus).
+- Build fix: `ClientCommandManager` was removed from Fabric API on 26.2, replaced by `ClientCommands` (same `literal(...)` method). Confirmed by looking directly at Fabric API's source on the 26.2 branch (the `ClientCommandManager.java` file no longer exists).
 
 ## 0.0.10
-- Fix build : `Inventory.selectedSlot` est une propriété (getter réel `getSelectedSlot()`), pas une méthode "nue" comme `mainCamera()`/`gameRenderState()`. Retiré les parenthèses en trop (`inventory.selectedSlot()` → `inventory.selectedSlot`). Le setter `setSelectedSlot(Int)` reste appelé explicitement.
+- Build fix: `Inventory.selectedSlot` is a property (real getter `getSelectedSlot()`), not a "bare" method like `mainCamera()`/`gameRenderState()`. Removed the extra parentheses (`inventory.selectedSlot()` → `inventory.selectedSlot`). The `setSelectedSlot(Int)` setter is still called explicitly.
 
 ## 0.0.9
-Corrections suite à un vrai build local (Kotlin `compileClientKotlin`) — Minecraft 26.2 a renommé/supprimé beaucoup plus de choses que prévu :
-- `Identifier.of(...)` → `Identifier.fromNamespaceAndPath(...)` (le vrai nom, confirmé).
-- Les catégories de touches ne sont plus de simples chaînes : `KeyMapping.Category.register(Identifier)` doit être enregistrée puis passée au constructeur `KeyMapping`.
-- `Inventory.selected` (champ public) devient `selectedSlot()` / `setSelectedSlot(int)` (méthodes).
-- `Player.playNotifySound(...)` n'existe plus → son joué via `Minecraft.soundManager.play(SimpleSoundInstance.forUI(...))`.
-- `GuiGraphicsExtractor.renderItem(...)` → `item(...)` (perte du préfixe `render`/`draw`, comme `text`/`centeredText`).
-- **X-ray (`XrayRenderer.kt`) réécrit une deuxième fois** : `Tesselator` est purement et simplement supprimé en 26.2 (plus de rendu immédiat). Remplacé par le nouveau système "submit" : `LevelRenderEvents.COLLECT_SUBMITS` + `OrderedSubmitNodeCollector#submitShapeOutline(...)`, où c'est le moteur qui dessine la forme (`Shapes.block()`) au lieu de construire les sommets à la main. Toujours le point le plus fragile du mod — cast `submitNodeCollector() as? OrderedSubmitNodeCollector` non garanti, chaîne du `RenderPipeline.builder(...)` pas vérifiée à 100 %.
+Fixes following a real local build (Kotlin `compileClientKotlin`) — Minecraft 26.2 renamed/removed a lot more than expected:
+- `Identifier.of(...)` → `Identifier.fromNamespaceAndPath(...)` (the real name, confirmed).
+- Key categories are no longer plain strings: `KeyMapping.Category.register(Identifier)` must be registered, then passed to the `KeyMapping` constructor.
+- `Inventory.selected` (public field) becomes `selectedSlot()` / `setSelectedSlot(int)` (methods).
+- `Player.playNotifySound(...)` no longer exists → sound played via `Minecraft.soundManager.play(SimpleSoundInstance.forUI(...))`.
+- `GuiGraphicsExtractor.renderItem(...)` → `item(...)` (loses the `render`/`draw` prefix, like `text`/`centeredText`).
+- **X-ray (`XrayRenderer.kt`) rewritten a second time**: `Tesselator` is purely and simply removed in 26.2 (no more immediate-mode rendering). Replaced by the new "submit" system: `LevelRenderEvents.COLLECT_SUBMITS` + `OrderedSubmitNodeCollector#submitShapeOutline(...)`, where the engine itself draws the shape (`Shapes.block()`) instead of building vertices by hand. Still the most fragile part of the mod — the `submitNodeCollector() as? OrderedSubmitNodeCollector` cast isn't guaranteed, the `RenderPipeline.builder(...)` chain isn't 100% verified.
 
 ## 0.0.8
-- Fix build : `AutoMiner.kt` et `XrayScanner.kt` déplacés de `src/main/kotlin` vers `src/client/kotlin`. Ils utilisent des classes client-only (`Minecraft`, `LocalPlayer`, `MultiPlayerGameMode`) qui n'existent pas sur le classpath du source set `main` avec `splitEnvironmentSourceSets()` — confirmé par une vraie erreur de compilation locale (`Unresolved reference`). Package inchangé (`com.jason54jg.miningmod`), donc aucun import à modifier ailleurs.
+- Build fix: `AutoMiner.kt` and `XrayScanner.kt` moved from `src/main/kotlin` to `src/client/kotlin`. They use client-only classes (`Minecraft`, `LocalPlayer`, `MultiPlayerGameMode`) that don't exist on the `main` source set's classpath with `splitEnvironmentSourceSets()` — confirmed by a real local compile error (`Unresolved reference`). Package unchanged (`com.jason54jg.miningmod`), so no imports to change elsewhere.
 
 ## 0.0.7
-- Fix build : ajout du repository Maven de TerraformersMC (`https://maven.terraformersmc.com/releases/`) dans `build.gradle`. Mod Menu n'est ni sur le Maven de Fabric ni sur Maven Central, `compileOnly "com.terraformersmc:modmenu:..."` ne pouvait pas se résoudre sans ce repository. Confirmé par un vrai build local (le reste — Loom, Fabric API, Fabric Language Kotlin, Java 25 — résolvait déjà correctement).
+- Build fix: added TerraformersMC's Maven repository (`https://maven.terraformersmc.com/releases/`) to `build.gradle`. Mod Menu is neither on Fabric's Maven nor on Maven Central, `compileOnly "com.terraformersmc:modmenu:..."` couldn't resolve without this repository. Confirmed by a real local build (everything else — Loom, Fabric API, Fabric Language Kotlin, Java 25 — already resolved fine).
 
 ## 0.0.6
-- X-ray minerais : contours rouges visibles à travers les murs, dans un rayon de 16 blocs, rescan toutes les secondes. Liste des minerais concernés réglable dans la config (`Voir à travers les murs`) : désactivé / précieux (diamant, émeraude, débris antique) / tous.
-- Refactor : ensembles/détection de minerais partagés entre le minage auto et le x-ray (`OreBlocks.kt`), au lieu d'être dupliqués.
-- **Expérimental** : le rendu 3D (`XrayRenderer.kt`) utilise l'API de rendu bas niveau de Minecraft 26.2 (RenderPipeline/RenderType), entièrement réécrite dans cette version et impossible à compiler dans le sandbox de développement pour vérifier. C'est le fichier le plus susceptible de demander une correction manuelle.
+- Ore x-ray: red outlines visible through walls, within a 16-block radius, rescanned every second. List of relevant ores configurable in the config (`See through walls`): off / valuable (diamond, emerald, ancient debris) / all.
+- Refactor: ore sets/detection shared between auto-mining and x-ray (`OreBlocks.kt`), instead of being duplicated.
+- **Experimental**: the 3D rendering (`XrayRenderer.kt`) uses Minecraft 26.2's low-level rendering API (RenderPipeline/RenderType), entirely rewritten in this version and impossible to compile in the dev sandbox to verify. This is the file most likely to need a manual fix.
 
 ## 0.0.5
-- Écran de config : "slot" outil (case cliquable avec icône) — clique dessus en tenant un outil en main pour le désigner comme outil de minage ; le mod l'équipe automatiquement depuis la hotbar pendant qu'il mine. Non persisté entre les redémarrages du jeu (choix en mémoire uniquement).
-- HUD moderne pendant le minage (coin haut-gauche) : temps écoulé, nombre de blocs cassés, détail par type de minerai (variantes deepslate fusionnées avec le minerai de base).
+- Config screen: tool "slot" (clickable box with icon) — click it while holding a tool to designate it as the mining tool; the mod automatically equips it from the hotbar while mining. Not persisted between game restarts (in-memory choice only).
+- Modern HUD while mining (top-left corner): elapsed time, number of blocks broken, breakdown by ore type (deepslate variants merged with the base ore).
 
 ## 0.0.4
-- Nouvelle option `pattern` (config + écran) : style de minage.
-  - `STRAIGHT` (par défaut) : tout droit, comme avant.
-  - `ZIGZAG` : alterne tout droit / droite / tout droit / gauche tous les 6 blocs avancés (tunnel en dents de scie, "de gauche à droite").
-  - `CIRCLE` : tourne à droite après chaque bras, avec des bras de plus en plus longs (spirale).
-- En zigzag/cercle, la direction de minage est pilotée par le mod (indépendante du regard) ; en `STRAIGHT`, elle suit toujours le regard comme avant.
+- New `pattern` option (config + screen): mining style.
+  - `STRAIGHT` (default): straight ahead, as before.
+  - `ZIGZAG`: alternates straight / right / straight / left every 6 blocks advanced (sawtooth tunnel, "left to right").
+  - `CIRCLE`: turns right after each arm, with increasingly long arms (spiral).
+- In zigzag/circle, the mining direction is driven by the mod (independent of the look direction); in `STRAIGHT`, it still follows the look direction as before.
 
 ## 0.0.3
-- Détection de téléportation : alerte si le joueur se déplace anormalement en un tick (≥ 8 blocs).
-- Détection de mention : alerte si le pseudo du joueur apparaît dans un message de chat.
-- Alerte = son (`experience_orb.pickup`) + écran qui clignote (fond rouge semi-transparent) pendant 3 secondes.
-- Correctif interne : Minecraft 26.2 a déplacé `Minecraft#setScreen` vers `Minecraft#gui#setScreen` (refonte Gui/Hud) — mis à jour dans la commande de config et l'écran de config.
+- Teleport detection: alerts if the player moves abnormally in one tick (≥ 8 blocks).
+- Mention detection: alerts if the player's name appears in a chat message.
+- Alert = sound (`experience_orb.pickup`) + flashing screen (semi-transparent red background) for 3 seconds.
+- Internal fix: Minecraft 26.2 moved `Minecraft#setScreen` to `Minecraft#gui#setScreen` (Gui/Hud rework) — updated in the config command and the config screen.
 
 ## 0.0.2
-- Configuration persistée (`config/miningmod.json`) : `reach` (portée/anticipation du tunnel), `blocksPerTick` (blocs cassables en un seul tick, pour serveurs non-vanilla avec capacités de casse instantanée multiple) et `lockYLevel` (reste au niveau Y où le minage a été activé, pour du strip mining en couche).
-- Commande `/miningmod config` pour ouvrir l'écran de configuration.
-- Intégration Mod Menu (optionnelle, sans dépendance dure) : bouton de config dans la liste des mods.
+- Persisted configuration (`config/miningmod.json`): `reach` (tunnel look-ahead/anticipation), `blocksPerTick` (blocks breakable in a single tick, for non-vanilla servers with multi-instant-break abilities) and `lockYLevel` (stays at the Y level where mining was activated, for layer strip mining).
+- `/miningmod config` command to open the config screen.
+- Mod Menu integration (optional, no hard dependency): config button in the mod list.
 
 ## 0.0.1
-- Création initiale du mod.
-- Touche (`B` par défaut) pour activer/désactiver le minage automatique en ligne droite : le joueur avance et casse les blocs devant lui (pieds + tête).
-- Exception minerai : tout bloc de minerai touchant le tunnel (vanilla + tag `c:ores`) est cassé avant de continuer.
+- Initial mod creation.
+- Key (`B` by default) to toggle straight-line automatic mining: the player advances and breaks the blocks in front of them (feet + head).
+- Ore exception: any ore block touching the tunnel (vanilla + `c:ores` tag) is broken before continuing.

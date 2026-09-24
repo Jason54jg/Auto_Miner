@@ -1,8 +1,8 @@
-package com.jason54jg.miningmod.client
+package com.jason54jg.autominer.client
 
-import com.jason54jg.miningmod.AutoMiner
-import com.jason54jg.miningmod.MiningModConfig
-import com.jason54jg.miningmod.MiningStats
+import com.jason54jg.autominer.AutoMiner
+import com.jason54jg.autominer.AutoMinerModConfig
+import com.jason54jg.autominer.MiningStats
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
@@ -14,11 +14,11 @@ object MiningHud {
     private val TEXT_COLOR = 0xFFFFFFFF.toInt()
     private val TITLE_COLOR = 0xFF55FF55.toInt()
 
-    private var offsetX = MiningModConfig.load().hudX
-    private var offsetY = MiningModConfig.load().hudY
+    private var offsetX = AutoMinerModConfig.load().hudX
+    private var offsetY = AutoMinerModConfig.load().hudY
 
     /** Position du panneau (coin haut-gauche), modifiable depuis l'écran de config. */
-    fun applyConfig(config: MiningModConfig) {
+    fun applyConfig(config: AutoMinerModConfig) {
         offsetX = config.hudX
         offsetY = config.hudY
     }
@@ -31,7 +31,7 @@ object MiningHud {
         val time = "%02d:%02d".format(elapsedSeconds / 60, elapsedSeconds % 60)
 
         val lines = buildList {
-            add("Mining Mod" to TITLE_COLOR)
+            add("Auto Miner" to TITLE_COLOR)
             add("Temps : $time" to TEXT_COLOR)
             add("Blocs cassés : ${MiningStats.blocksBroken}" to TEXT_COLOR)
             MiningStats.ores.forEach { (name, count) -> add("$name : $count" to TEXT_COLOR) }

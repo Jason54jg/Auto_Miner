@@ -1,4 +1,4 @@
-package com.jason54jg.miningmod
+package com.jason54jg.autominer
 
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags
 import net.minecraft.world.level.block.Block

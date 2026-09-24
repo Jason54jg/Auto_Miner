@@ -1,4 +1,4 @@
-package com.jason54jg.miningmod
+package com.jason54jg.autominer
 
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
@@ -8,10 +8,10 @@ import net.minecraft.world.level.block.Blocks
 /**
  * Bloc supplémentaire désigné par le joueur comme "à casser impérativement", en plus
  * de la liste de minerais vanilla (utile pour un bloc custom d'un serveur moddé).
- * Persisté via [MiningModConfig.customBlockId] (résolu au chargement).
+ * Persisté via [AutoMinerModConfig.customBlockId] (résolu au chargement).
  */
 object CustomOreSelection {
-    var block: Block? = MiningModConfig.load().customBlockId?.let(::resolve)
+    var block: Block? = AutoMinerModConfig.load().customBlockId?.let(::resolve)
 
     fun idOf(block: Block): String = BuiltInRegistries.BLOCK.getKey(block).toString()
 

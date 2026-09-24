@@ -1,4 +1,4 @@
-package com.jason54jg.miningmod
+package com.jason54jg.autominer
 
 import com.google.gson.GsonBuilder
 import net.fabricmc.loader.api.FabricLoader
@@ -8,7 +8,7 @@ import java.nio.file.Files
  * Réglages persistés du mod, pour s'adapter aux serveurs non-vanilla
  * (portée étendue, capacités de casse multiple, etc.).
  */
-data class MiningModConfig(
+data class AutoMinerModConfig(
     var reach: Double = 4.5,
     var blocksPerTick: Int = 1,
     var lockYLevel: Boolean = false,
@@ -24,18 +24,18 @@ data class MiningModConfig(
 ) {
     companion object {
         private val GSON = GsonBuilder().setPrettyPrinting().create()
-        private val PATH = FabricLoader.getInstance().configDir.resolve("miningmod.json")
+        private val PATH = FabricLoader.getInstance().configDir.resolve("autominer.json")
 
-        fun load(): MiningModConfig {
+        fun load(): AutoMinerModConfig {
             if (!Files.exists(PATH)) {
-                return MiningModConfig().also(::save)
+                return AutoMinerModConfig().also(::save)
             }
             return runCatching {
-                Files.newBufferedReader(PATH).use { GSON.fromJson(it, MiningModConfig::class.java) }
-            }.getOrElse { MiningModConfig() }
+                Files.newBufferedReader(PATH).use { GSON.fromJson(it, AutoMinerModConfig::class.java) }
+            }.getOrElse { AutoMinerModConfig() }
         }
 
-        fun save(config: MiningModConfig) {
+        fun save(config: AutoMinerModConfig) {
             Files.createDirectories(PATH.parent)
             Files.newBufferedWriter(PATH).use { GSON.toJson(config, it) }
         }

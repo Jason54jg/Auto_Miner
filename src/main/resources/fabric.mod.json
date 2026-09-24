@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "miningmod",
+	"id": "autominer",
 	"version": "${version}",
-	"name": "Mining Mod",
+	"name": "Auto Miner",
 	"description": "Mine et avance tout droit automatiquement en maintenant une touche, en cassant systématiquement les minerais rencontrés autour du tunnel.",
 	"authors": [
 		"Jason54jg"
@@ -16,19 +16,19 @@
 		"main": [
 			{
 				"adapter": "kotlin",
-				"value": "com.jason54jg.miningmod.MiningMod"
+				"value": "com.jason54jg.autominer.AutoMinerMod"
 			}
 		],
 		"client": [
 			{
 				"adapter": "kotlin",
-				"value": "com.jason54jg.miningmod.client.MiningModClient"
+				"value": "com.jason54jg.autominer.client.AutoMinerModClient"
 			}
 		],
 		"modmenu": [
 			{
 				"adapter": "kotlin",
-				"value": "com.jason54jg.miningmod.client.MiningModMenuIntegration"
+				"value": "com.jason54jg.autominer.client.AutoMinerModMenuIntegration"
 			}
 		]
 	},

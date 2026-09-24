@@ -1,9 +1,9 @@
-package com.jason54jg.miningmod.client
+package com.jason54jg.autominer.client
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory
 import com.terraformersmc.modmenu.api.ModMenuApi
 
-object MiningModMenuIntegration : ModMenuApi {
+object AutoMinerModMenuIntegration : ModMenuApi {
     override fun getModConfigScreenFactory(): ConfigScreenFactory<*> =
-        ConfigScreenFactory { parent -> MiningModConfigScreen(parent) }
+        ConfigScreenFactory { parent -> AutoMinerModConfigScreen(parent) }
 }

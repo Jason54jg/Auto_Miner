@@ -1,6 +1,6 @@
-package com.jason54jg.miningmod.client
+package com.jason54jg.autominer.client
 
-import com.jason54jg.miningmod.AutoMiner
+import com.jason54jg.autominer.AutoMiner
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
@@ -13,16 +13,16 @@ import net.minecraft.client.Minecraft
 import net.minecraft.resources.Identifier
 import org.lwjgl.glfw.GLFW
 
-object MiningModClient : ClientModInitializer {
+object AutoMinerModClient : ClientModInitializer {
     private var mouseUngrabbed = false
 
     override fun onInitializeClient() {
-        val category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("miningmod", "main"))
+        val category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("autominer", "main"))
         val toggleKey = KeyMappingHelper.registerKeyMapping(
-            KeyMapping("key.miningmod.toggle", GLFW.GLFW_KEY_B, category)
+            KeyMapping("key.autominer.toggle", GLFW.GLFW_KEY_B, category)
         )
         val ungrabKey = KeyMappingHelper.registerKeyMapping(
-            KeyMapping("key.miningmod.ungrab", GLFW.GLFW_KEY_N, category)
+            KeyMapping("key.autominer.ungrab", GLFW.GLFW_KEY_N, category)
         )
 
         ClientTickEvents.END_CLIENT_TICK.register { client ->
@@ -37,12 +37,12 @@ object MiningModClient : ClientModInitializer {
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             dispatcher.register(
-                ClientCommands.literal("miningbot").executes {
+                ClientCommands.literal("autominer").executes {
                     // Le ChatScreen ferme l'écran courant (setScreen(null)) juste après l'envoi de la
                     // commande, dans le même appel : ouvrir l'écran ici serait aussitôt écrasé. On le
                     // reporte à la tâche suivante de la boucle client, une fois le chat déjà fermé.
                     Minecraft.getInstance().execute {
-                        Minecraft.getInstance().gui.setScreen(MiningModConfigScreen(null))
+                        Minecraft.getInstance().gui.setScreen(AutoMinerModConfigScreen(null))
                     }
                     1
                 }
@@ -53,10 +53,10 @@ object MiningModClient : ClientModInitializer {
             if (AutoMiner.active) AlertManager.checkMention(Minecraft.getInstance(), message)
         }
 
-        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("miningmod", "mining_hud")) { graphics, _ ->
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("autominer", "mining_hud")) { graphics, _ ->
             MiningHud.render(graphics)
         }
-        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("miningmod", "alert_flash")) { graphics, _ ->
+        HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("autominer", "alert_flash")) { graphics, _ ->
             ScreenFlash.render(graphics)
         }
     }

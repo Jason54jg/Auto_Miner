@@ -1,48 +1,50 @@
-# Mining Mod
+# Auto Miner
 
-Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
+*English | [Français](README.fr.md)*
 
-Version actuelle : **0.0.37** (voir [CHANGELOG.md](CHANGELOG.md))
+Fabric mod for Minecraft **26.2** that digs a straight tunnel automatically: a key toggles mining, the player advances while breaking the blocks in front of them, and systematically breaks any ore touching the tunnel.
 
-## Fonctionnalités
+Current version: **0.0.39** (see [CHANGELOG.md](CHANGELOG.md))
 
-- Touche **B** (rebindable dans les options du jeu) pour activer/désactiver le minage automatique — un message coloré dans le chat confirme à chaque fois ("Minage automatique activé" en vert, "désactivé" en rouge).
-- Une fois activé, le mod :
-  - casse les blocs devant le joueur (tête d'abord, puis pieds — le viseur pointe la tête), dans la direction figée au moment de l'activation ;
-  - fait avancer le joueur dans le tunnel une fois celui-ci dégagé ;
-  - **exception minerai** : un minerai (vanilla ou tag `c:ores` pour la compatibilité avec d'autres mods) qui touche le tunnel est cassé avant de continuer, même s'il n'est pas exactement dans l'axe de percement. Le **bloc obligatoire**, lui, est détecté à portée tout autour du joueur (devant, derrière, sur les côtés, au-dessus, en dessous), pas seulement s'il touche le tunnel.
-  - le joueur n'a plus rien à faire une fois activé : le mod pilote entièrement le déplacement **et** la caméra, aucun mouvement ni visée n'est nécessaire.
-- Le minage respecte les règles normales de casse (outil, dureté du bloc, drops, XP) : ce n'est pas de la casse instantanée en survie.
-- S'arrête automatiquement sur un bloc incassable (bedrock, etc.) ou un liquide : après ~1s sans casser ni avancer, le minage se coupe tout seul et alerte le joueur (son + flash), au lieu de rester bloqué en silence.
-- **Configurable pour serveurs non-vanilla** (`/miningbot` ou bouton Mod Menu) :
-  - `Portée`, `Blocs/tick`, `Couche Y` et `Largeur du tunnel` sont des champs de texte libres (n'importe quelle valeur, pas juste des présélections) ;
-  - `Portée` : distance d'anticipation du tunnel et de détection des minerais (utile si le joueur a une portée étendue par un autre mod/une capacité) ;
-  - `Blocs/tick` : nombre de blocs pouvant être cassés en un seul tick (utile avec haste/efficacité ou une capacité de casse instantanée multiple) ;
-  - `Verrouiller le niveau Y` + `Couche Y` : le tunnel reste à la hauteur choisie plutôt qu'à celle où le minage a été activé. Le mod descend automatiquement (casse le bloc sous les pieds, attend d'atterrir, recommence) jusqu'à cette couche avant de creuser à l'horizontale — pas un vrai pathfinding, juste une descente verticale, qui s'arrête net sur un bloc incassable ou un liquide.
-  - `Largeur du tunnel` : élargit la zone minée latéralement (utile avec un outil qui a son propre effet de zone, ou juste pour creuser plus large).
-  - **Slot "Bloc obligatoire"** : vise le bloc voulu dans le monde, puis ouvre `/miningbot` et clique sur le slot — désigne ce bloc custom comme à casser impérativement dès qu'il est détecté à portée, où qu'il soit autour du joueur (contrairement aux minerais vanilla, limités à ce qui touche le tunnel). Utile sur un serveur moddé avec ses propres blocs de ressource. Choix en mémoire seulement (comme le slot outil).
-  - `Position HUD X`/`Position HUD Y` : déplace le panneau du HUD de minage (coin haut-gauche par défaut) où tu veux à l'écran, en pixels.
-  - Réglages sauvegardés dans `config/miningmod.json` (sauf le slot outil et le bloc obligatoire, volontairement non persistés).
-- **Alertes téléportation/mention** (actives uniquement pendant que le minage tourne) : un son (ding) et un flash rouge de l'écran pendant 3 secondes se déclenchent si :
-  - le joueur se déplace de façon anormale en un seul tick (téléportation, TP admin, etc.) ;
-  - le pseudo du joueur apparaît dans un message de chat reçu (mention).
-- Minage tout droit uniquement : la direction est figée dès l'activation (plus jamais liée au regard en direct) et la caméra reste fixe dessus tant que le minage tourne.
-- Le bot ne marche pas dans le vide **si `Verrouiller le niveau Y` est actif** (et que le joueur ne vole pas) : sans sol devant (trou, ravin), il saute par-dessus si le trou fait 1 bloc de large, sinon il s'arrête au lieu de tomber. Sans verrouillage, ou en vol créatif/spectateur, aucune hauteur à maintenir : il ignore les trous et avance tout droit sans se soucier du sol — le bloc devant lui, s'il y en a un, est cassé normalement dans tous les cas.
-- Le bloc qui porte le joueur n'est jamais cassé, même s'il correspond à un minerai/bloc obligatoire détecté juste sous les pieds — évite de tomber dans le vide en minant son propre plancher.
-- **Touche "libérer la souris"** (`key.miningmod.ungrab`, par défaut `N`) : évite qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille.
-- **Slot outil** (écran de config) : case cliquable qui capture l'objet actuellement en main du joueur comme outil de minage ; le mod l'équipe automatiquement depuis la hotbar avant de miner. Choix en mémoire seulement (non sauvegardé entre deux lancements du jeu).
-- **HUD de minage** (coin haut-gauche, visible pendant que le minage est actif) :
-  - temps écoulé depuis l'activation ;
-  - nombre total de blocs cassés ;
-  - détail par type de minerai cassé (les variantes deepslate sont fusionnées avec le minerai de base).
+## Features
 
-## Prérequis
+- **B** key (rebindable in the game's options) to toggle automatic mining on/off — a colored chat message confirms it every time ("Auto-mining enabled" in green, "disabled" in red).
+- Once enabled, the mod:
+  - breaks the blocks in front of the player (head first, then feet — the crosshair points at the head), in the direction locked in at activation ;
+  - moves the player forward through the tunnel once it's clear ;
+  - **ore exception**: an ore (vanilla or the `c:ores` tag, for compatibility with other mods) touching the tunnel is broken before continuing, even if it's not exactly on the drilling axis. The **mandatory block**, on the other hand, is detected within range all around the player (front, back, sides, above, below), not just when it touches the tunnel.
+  - the player has nothing left to do once it's active: the mod fully drives both movement **and** the camera, no movement or aiming is needed.
+- Mining follows normal breaking rules (tool, block hardness, drops, XP): this is not instant-break in survival.
+- Stops automatically on an unbreakable block (bedrock, etc.) or a liquid: after ~1s without breaking or advancing, mining shuts itself off and alerts the player (sound + flash) instead of staying silently stuck.
+- **Configurable for non-vanilla servers** (`/autominer` or the Mod Menu button):
+  - `Reach`, `Blocks/tick`, `Y level` and `Tunnel width` are free-text fields (any value, not just presets) ;
+  - `Reach`: how far ahead the tunnel is anticipated and ore is detected (useful if the player has extended reach from another mod/ability) ;
+  - `Blocks/tick`: number of blocks that can be broken in a single tick (useful with haste/efficiency or a multi-instant-break ability) ;
+  - `Lock Y level` + `Y level`: the tunnel stays at the chosen height instead of the one where mining was activated. The mod automatically descends (breaks the block underfoot, waits to land, repeats) to that layer before digging horizontally — not real pathfinding, just a controlled vertical descent, which stops dead on an unbreakable block or a liquid.
+  - `Tunnel width`: widens the mined area sideways (useful with a tool that has its own area effect, or just to dig wider).
+  - **"Mandatory block" slot**: aim at the block you want in the world, then open `/autominer` and click the slot — designates that custom block as mandatory to break as soon as it's detected in range, wherever it is around the player (unlike vanilla ores, limited to what touches the tunnel). Useful on a modded server with its own resource blocks. In-memory choice only (like the tool slot).
+  - `HUD position X`/`HUD position Y`: moves the mining HUD panel (top-left by default) wherever you want on screen, in pixels.
+  - Settings saved to `config/autominer.json` (except the tool slot and mandatory block, deliberately not persisted).
+- **Teleport/mention alerts** (active only while mining is running): a sound (ding) and a red screen flash for 3 seconds trigger if:
+  - the player moves abnormally in a single tick (teleport, admin TP, etc.) ;
+  - the player's name appears in a received chat message (mention).
+- Straight-line mining only: the direction is locked in at activation (never tied to the live look direction again) and the camera stays fixed on it as long as mining is running.
+- The bot doesn't walk into thin air **if `Lock Y level` is active** (and the player isn't flying): with no floor ahead (hole, ravine), it jumps over a 1-block-wide hole, otherwise it stops instead of falling. Without the lock, or while flying in creative/spectator, there's no height to maintain: it ignores holes and keeps going straight ahead regardless of the floor — the block in front of it, if any, is still broken normally either way.
+- The block holding the player up is never broken, even if it matches an ore/mandatory block detected right underfoot — avoids falling into the void by mining its own floor.
+- **"Release mouse" key** (`key.autominer.ungrab`, `N` by default): prevents an unintentional mouse movement from turning the camera (and therefore the mining direction) while the bot is working.
+- **Tool slot** (config screen): clickable slot that captures the item currently held by the player as the mining tool; the mod automatically equips it from the hotbar before mining. In-memory choice only (not saved between game launches).
+- **Mining HUD** (top-left corner, visible while mining is active):
+  - time elapsed since activation ;
+  - total number of blocks broken ;
+  - breakdown by ore type broken (deepslate variants are merged with the base ore).
+
+## Requirements
 
 - Minecraft **26.2**
 - [Fabric Loader](https://fabricmc.net/) `>= 0.19.5`
 - [Fabric API](https://modrinth.com/mod/fabric-api) `0.161.0+26.2`
 - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) `1.13.12+kotlin.2.4.0`
-- [Mod Menu](https://modrinth.com/mod/modmenu) `20.0.1` *(optionnel, pour le bouton de configuration dans la liste des mods)*
+- [Mod Menu](https://modrinth.com/mod/modmenu) `20.0.1` *(optional, for the config button in the mod list)*
 - Java **25**
 
 ## Build
@@ -51,29 +53,29 @@ Version actuelle : **0.0.37** (voir [CHANGELOG.md](CHANGELOG.md))
 ./gradlew build
 ```
 
-Le `.jar` généré se trouve dans `build/libs/`.
+The generated `.jar` is in `build/libs/`.
 
 ## Installation
 
-1. Installer Fabric Loader pour Minecraft 26.2.
-2. Placer dans le dossier `mods/` :
-   - `miningmod-<version>.jar`
+1. Install Fabric Loader for Minecraft 26.2.
+2. Place in the `mods/` folder:
+   - `autominer-<version>.jar`
    - `fabric-api-<version>.jar`
    - `fabric-language-kotlin-<version>.jar`
 
-## Structure du projet
+## Project structure
 
 ```
 src/
-├── main/kotlin/...    # Données/logique communes (config, stats, mod initializer) — pas de classes client-only
-├── client/kotlin/...  # AutoMiner, x-ray, keybind, HUD, écrans (tout ce qui touche Minecraft/LocalPlayer/rendu)
+├── main/kotlin/...    # Shared data/logic (config, stats, mod initializer) — no client-only classes
+├── client/kotlin/...  # AutoMiner, keybinds, HUD, screens (everything touching Minecraft/LocalPlayer/rendering)
 └── main/resources/    # fabric.mod.json, lang
 ```
 
 ## Versioning
 
-Chaque nouvelle demande de fonctionnalité/modification incrémente la version de `0.0.1` (`0.0.1` → `0.0.2` → `0.0.3`, ...). Le détail de chaque version est dans [CHANGELOG.md](CHANGELOG.md).
+Each new feature/change request bumps the version by `0.0.1` (`0.0.1` → `0.0.2` → `0.0.3`, ...). Details of each version are in [CHANGELOG.md](CHANGELOG.md).
 
-## Licence
+## License
 
 [MIT](LICENSE)

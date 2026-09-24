@@ -1,9 +1,9 @@
-package com.jason54jg.miningmod.client
+package com.jason54jg.autominer.client
 
-import com.jason54jg.miningmod.AutoMiner
-import com.jason54jg.miningmod.CustomOreSelection
-import com.jason54jg.miningmod.MiningModConfig
-import com.jason54jg.miningmod.ToolSelection
+import com.jason54jg.autominer.AutoMiner
+import com.jason54jg.autominer.CustomOreSelection
+import com.jason54jg.autominer.AutoMinerModConfig
+import com.jason54jg.autominer.ToolSelection
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.BlockHitResult
 
-class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.literal("Mining Mod")) {
-    private var config = MiningModConfig.load()
+class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.literal("Auto Miner")) {
+    private var config = AutoMinerModConfig.load()
 
     private var reachRowY = 0
     private var blocksRowY = 0
@@ -90,7 +90,7 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         y += 24
 
         // Slot minerai custom : clic = capture le bloc visé (regardé juste avant d'ouvrir cet écran)
-        // comme "à casser impérativement". Vise le bloc AVANT d'ouvrir la config avec /miningbot.
+        // comme "à casser impérativement". Vise le bloc AVANT d'ouvrir la config avec /autominer.
         oreSlotX = centerX - 100
         oreSlotY = y
         addRenderableWidget(
@@ -152,7 +152,7 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
             toolItemId = ToolSelection.item?.let(ToolSelection::idOf),
             customBlockId = CustomOreSelection.block?.let(CustomOreSelection::idOf)
         )
-        MiningModConfig.save(finalConfig)
+        AutoMinerModConfig.save(finalConfig)
         AutoMiner.applyConfig(finalConfig)
         MiningHud.applyConfig(finalConfig)
         minecraft?.gui?.setScreen(parent)

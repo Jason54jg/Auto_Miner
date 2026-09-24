@@ -1,4 +1,4 @@
-package com.jason54jg.miningmod
+package com.jason54jg.autominer
 
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.state.BlockState
