@@ -1,5 +1,5 @@
 {
-	"key.categories.autominer.main": "Auto Miner",
+	"key.category.autominer.main": "Auto Miner",
 	"key.autominer.toggle": "Activer/Désactiver le tunnel automatique",
 	"key.autominer.ungrab": "Libérer/Reprendre la souris",
 
@@ -22,7 +22,10 @@
 	"hud.autominer.time": "Temps : %s",
 	"hud.autominer.blocks_broken": "Blocs cassés : %s",
 	"hud.autominer.ore_count": "%s : %s",
+	"hud.autominer.mouse_released": "Souris libérée (%s pour la reprendre)",
 
 	"chat.autominer.enabled": "Minage automatique activé",
-	"chat.autominer.disabled": "Minage automatique désactivé"
+	"chat.autominer.disabled": "Minage automatique désactivé",
+	"chat.autominer.mouse_released": "Souris libérée",
+	"chat.autominer.mouse_grabbed": "Souris reprise"
 }

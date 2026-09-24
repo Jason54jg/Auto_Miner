@@ -4,6 +4,14 @@
 
 Each new request bumps the version by `0.0.1`.
 
+## 0.0.42
+- Fix: the on-screen mouse-release reminder hardcoded "N" as the key name, which became wrong if the player rebinds `key.autominer.ungrab` in the controls options. Now shows the key's actual current binding (`KeyMapping.translatedKeyMessage`).
+
+## 0.0.41
+- Fix: the keybind category showed as raw untranslated text (`key.category.autominer.main`) in Options > Controls. The new `KeyMapping.Category` system on 26.2 generates keys as `key.category.<namespace>.<path>` (singular), not the old `key.categories.<name>` (plural) — lang files updated to match.
+- Chat message when releasing/grabbing the mouse back (`N`), same as the mining toggle.
+- Persistent on-screen reminder while the mouse stays released — easy to forget it's still on, unlike mining which already has its own HUD.
+
 ## 0.0.40
 - In-game UI actually localized (not just the docs from 0.0.39): the config screen, HUD and chat activation messages were hardcoded French strings, ignoring the client's game language entirely. They now use Minecraft's translation system (`Component.translatable`, `en_us.json`/`fr_fr.json`), matching what the two keybind names already did. Tool/mandatory-block names now show Minecraft's own localized item/block name instead of a raw `snake_case` registry path.
 

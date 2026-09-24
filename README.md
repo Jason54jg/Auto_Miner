@@ -4,7 +4,7 @@
 
 Fabric mod for Minecraft **26.2** that digs a straight tunnel automatically: a key toggles mining, the player advances while breaking the blocks in front of them, and systematically breaks any ore touching the tunnel.
 
-Current version: **0.0.40** (see [CHANGELOG.md](CHANGELOG.md))
+Current version: **0.0.42** (see [CHANGELOG.md](CHANGELOG.md))
 
 ## Features
 
@@ -31,7 +31,7 @@ Current version: **0.0.40** (see [CHANGELOG.md](CHANGELOG.md))
 - Straight-line mining only: the direction is locked in at activation (never tied to the live look direction again) and the camera stays fixed on it as long as mining is running.
 - The bot doesn't walk into thin air **if `Lock Y level` is active** (and the player isn't flying): with no floor ahead (hole, ravine), it jumps over a 1-block-wide hole, otherwise it stops instead of falling. Without the lock, or while flying in creative/spectator, there's no height to maintain: it ignores holes and keeps going straight ahead regardless of the floor — the block in front of it, if any, is still broken normally either way.
 - The block holding the player up is never broken, even if it matches an ore/mandatory block detected right underfoot — avoids falling into the void by mining its own floor.
-- **"Release mouse" key** (`key.autominer.ungrab`, `N` by default): prevents an unintentional mouse movement from turning the camera (and therefore the mining direction) while the bot is working.
+- **"Release mouse" key** (`key.autominer.ungrab`, `N` by default): prevents an unintentional mouse movement from turning the camera (and therefore the mining direction) while the bot is working. A chat message confirms it every time, and a reminder stays on screen for as long as the mouse remains released.
 - **Tool slot** (config screen): clickable slot that captures the item currently held by the player as the mining tool; the mod automatically equips it from the hotbar before mining. In-memory choice only (not saved between game launches).
 - **Mining HUD** (top-left corner, visible while mining is active):
   - time elapsed since activation ;

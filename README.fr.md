@@ -4,7 +4,7 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.40** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
+Version actuelle : **0.0.42** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
 
 ## Fonctionnalités
 
@@ -31,7 +31,7 @@ Version actuelle : **0.0.40** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
 - Minage tout droit uniquement : la direction est figée dès l'activation (plus jamais liée au regard en direct) et la caméra reste fixe dessus tant que le minage tourne.
 - Le bot ne marche pas dans le vide **si `Verrouiller le niveau Y` est actif** (et que le joueur ne vole pas) : sans sol devant (trou, ravin), il saute par-dessus si le trou fait 1 bloc de large, sinon il s'arrête au lieu de tomber. Sans verrouillage, ou en vol créatif/spectateur, aucune hauteur à maintenir : il ignore les trous et avance tout droit sans se soucier du sol — le bloc devant lui, s'il y en a un, est cassé normalement dans tous les cas.
 - Le bloc qui porte le joueur n'est jamais cassé, même s'il correspond à un minerai/bloc obligatoire détecté juste sous les pieds — évite de tomber dans le vide en minant son propre plancher.
-- **Touche "libérer la souris"** (`key.autominer.ungrab`, par défaut `N`) : évite qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille.
+- **Touche "libérer la souris"** (`key.autominer.ungrab`, par défaut `N`) : évite qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille. Un message dans le chat confirme à chaque fois, et un rappel reste affiché à l'écran tant que la souris est libérée.
 - **Slot outil** (écran de config) : case cliquable qui capture l'objet actuellement en main du joueur comme outil de minage ; le mod l'équipe automatiquement depuis la hotbar avant de miner. Choix en mémoire seulement (non sauvegardé entre deux lancements du jeu).
 - **HUD de minage** (coin haut-gauche, visible pendant que le minage est actif) :
   - temps écoulé depuis l'activation ;

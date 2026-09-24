@@ -1,5 +1,5 @@
 {
-	"key.categories.autominer.main": "Auto Miner",
+	"key.category.autominer.main": "Auto Miner",
 	"key.autominer.toggle": "Toggle auto-tunnel",
 	"key.autominer.ungrab": "Release/Grab mouse",
 
@@ -22,7 +22,10 @@
 	"hud.autominer.time": "Time: %s",
 	"hud.autominer.blocks_broken": "Blocks broken: %s",
 	"hud.autominer.ore_count": "%s: %s",
+	"hud.autominer.mouse_released": "Mouse released (press %s to grab it back)",
 
 	"chat.autominer.enabled": "Automatic mining enabled",
-	"chat.autominer.disabled": "Automatic mining disabled"
+	"chat.autominer.disabled": "Automatic mining disabled",
+	"chat.autominer.mouse_released": "Mouse released",
+	"chat.autominer.mouse_grabbed": "Mouse grabbed back"
 }
