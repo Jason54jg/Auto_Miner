@@ -2,6 +2,13 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.28
+- Le scan large (cube autour du joueur, toutes directions) est maintenant réservé au **bloc obligatoire**. Les minerais vanilla/tag reviennent à l'ancien comportement "touche le tunnel" — sinon un minerai croisé dans un mur à distance trouait le tunnel au hasard. Pas de scan du tout si aucun bloc obligatoire n'est choisi (évite le coût du cube pour rien).
+
+## 0.0.27
+- Autonomie complète : la direction de minage/déplacement (tous styles, y compris "Tout droit") est maintenant figée à l'activation et n'est plus jamais lue depuis le regard en direct. La caméra suit automatiquement (fixe en ligne droite, clampée à ±30° en zigzag/cercle) : plus aucun mouvement ni visée du joueur n'est nécessaire une fois le minage lancé.
+- Détection des blocs prioritaires (minerais + bloc obligatoire) : passe d'un scan limité aux blocs touchant le tunnel devant, à un scan en cube autour du joueur (portée = `Portée`), dans toutes les directions — un minerai est cassé en premier dès qu'il est détecté à portée, même sur le côté, au-dessus, en dessous ou derrière.
+
 ## 0.0.26
 - Fix compile : `BuiltInRegistries.BLOCK.get(Identifier)` / `.ITEM.get(Identifier)` renvoient maintenant `Optional<Holder.Reference<T>>?` au lieu de `T?` directement. `ToolSelection.resolve`/`CustomOreSelection.resolve` déballent via `.orElse(null)?.value()`.
 

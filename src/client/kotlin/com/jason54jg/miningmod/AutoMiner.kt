@@ -116,14 +116,15 @@ object AutoMiner {
     }
 
     /**
-     * En zigzag/cercle, tourne légèrement la tête vers la direction pilotée par le mod, sans
-     * jamais dépasser [MAX_VIEW_DEVIATION] par rapport à la direction de départ : le tunnel peut
-     * faire des crans à 90°, mais la caméra reste dans le champ de vision d'origine du joueur.
+     * Le mod pilote entièrement la caméra : aucun mouvement du joueur n'est nécessaire une fois
+     * le minage activé. En ligne droite, la vue reste figée sur la direction de départ. En
+     * zigzag/cercle, elle suit la direction pilotée par le mod sans jamais dépasser
+     * [MAX_VIEW_DEVIATION] par rapport à cette même direction de départ : le tunnel peut faire des
+     * crans à 90°, la caméra reste dans le champ de vision d'origine du joueur.
      */
     private fun syncViewToFacing(player: LocalPlayer) {
-        if (config.pattern == MiningPattern.STRAIGHT) return
         val base = yawFor(baseFacing ?: return)
-        val target = yawFor(currentFacing ?: return)
+        val target = if (config.pattern == MiningPattern.STRAIGHT) base else yawFor(currentFacing ?: return)
         val yaw = base + clampAngleDelta(target - base, MAX_VIEW_DEVIATION)
         player.yRot = yaw
         player.yHeadRot = yaw
@@ -179,13 +180,15 @@ object AutoMiner {
         val immediateFeet = lateralOffsets.map { offset -> offsetPosition(immediateForward, facing, offset) }
         val immediate = immediateFeet.flatMap { listOf(it, it.above()) }
 
-        val ores = path
+        val touchingOres = path
             .flatMap { pos -> Direction.values().map(pos::relative) }
-            .filter { pos -> pos !in path && isPriorityOre(level.getBlockState(pos)) }
+            .filter { pos -> pos !in path && isVanillaOre(level.getBlockState(pos)) }
             .distinct()
+        val nearbyCustomBlocks = scanForCustomBlock(level, origin, lookahead)
+            .sortedBy { it.distSqr(origin) }
 
         val current = target?.takeIf { isBreakable(level, it) }
-            ?: (ores + path).firstOrNull { isBreakable(level, it) }
+            ?: (nearbyCustomBlocks + touchingOres + path).firstOrNull { isBreakable(level, it) }
 
         if (current == null) {
             target = null
@@ -228,10 +231,27 @@ object AutoMiner {
         return true
     }
 
+    private fun isVanillaOre(state: BlockState): Boolean = OreBlocks.isOre(state)
+
+    private fun isCustomBlock(state: BlockState): Boolean = state.block == CustomOreSelection.block
+
     /** Minerai vanilla/tag, ou bloc custom désigné par le joueur comme "à casser impérativement". */
-    private fun isPriorityOre(state: BlockState): Boolean {
-        if (OreBlocks.isOre(state)) return true
-        return state.block == CustomOreSelection.block
+    private fun isPriorityOre(state: BlockState): Boolean = isVanillaOre(state) || isCustomBlock(state)
+
+    /**
+     * Balaie un cube de [radius] blocs autour de [center] à la recherche du bloc obligatoire
+     * uniquement : lui doit être détecté où qu'il soit autour du joueur. Les minerais vanilla
+     * restent limités à ce qui touche le tunnel (sinon ça troue les murs au hasard sur un simple
+     * minerai de fer croisé au passage).
+     */
+    private fun scanForCustomBlock(level: Level, center: BlockPos, radius: Int): List<BlockPos> {
+        if (CustomOreSelection.block == null) return emptyList()
+        val range = -radius..radius
+        val positions = ArrayList<BlockPos>()
+        for (dx in range) for (dy in range) for (dz in range) {
+            positions.add(center.offset(dx, dy, dz))
+        }
+        return positions.filter { pos -> isCustomBlock(level.getBlockState(pos)) }
     }
 
     private fun advance(player: LocalPlayer, level: Level, immediate: List<BlockPos>, feet: List<BlockPos>, facing: Direction) {
@@ -250,9 +270,9 @@ object AutoMiner {
         onAdvanced()
     }
 
-    /** Direction de minage/déplacement effective : suit le regard en ligne droite, ou le style choisi sinon. */
+    /** Direction de minage/déplacement effective : figée à l'activation, jamais celle du regard en direct. */
     private fun resolveFacing(player: LocalPlayer): Direction {
-        if (config.pattern == MiningPattern.STRAIGHT) return player.direction
+        if (config.pattern == MiningPattern.STRAIGHT) return baseFacing ?: player.direction
         return currentFacing ?: player.direction
     }
 
