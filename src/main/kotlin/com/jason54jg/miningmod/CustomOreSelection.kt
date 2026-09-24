@@ -17,6 +17,7 @@ object CustomOreSelection {
 
     private fun resolve(id: String): Block? {
         val identifier = runCatching { Identifier.parse(id) }.getOrNull() ?: return null
-        return BuiltInRegistries.BLOCK.get(identifier).takeUnless { it == Blocks.AIR }
+        val block = BuiltInRegistries.BLOCK.get(identifier)?.orElse(null)?.value()
+        return block?.takeUnless { it == Blocks.AIR }
     }
 }

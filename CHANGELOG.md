@@ -2,6 +2,9 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.26
+- Fix compile : `BuiltInRegistries.BLOCK.get(Identifier)` / `.ITEM.get(Identifier)` renvoient maintenant `Optional<Holder.Reference<T>>?` au lieu de `T?` directement. `ToolSelection.resolve`/`CustomOreSelection.resolve` déballent via `.orElse(null)?.value()`.
+
 ## 0.0.25
 - Fix possible : `isBreakable` excluait tout bloc renvoyant un `fluidState` non vide, ce qui exclut aussi un bloc solide **waterlogged** (un minerai custom immergé, par ex.), pas seulement l'eau/la lave elles-mêmes. Utilise maintenant `state.liquid()` (vrai uniquement pour un bloc de fluide) pour ne plus bloquer un bloc obligatoire/minerai simplement parce qu'il est sous l'eau.
 

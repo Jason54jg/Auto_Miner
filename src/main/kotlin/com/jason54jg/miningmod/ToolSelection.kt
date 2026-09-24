@@ -16,6 +16,7 @@ object ToolSelection {
 
     private fun resolve(id: String): Item? {
         val identifier = runCatching { Identifier.parse(id) }.getOrNull() ?: return null
-        return BuiltInRegistries.ITEM.get(identifier).takeUnless { it == Items.AIR }
+        val item = BuiltInRegistries.ITEM.get(identifier)?.orElse(null)?.value()
+        return item?.takeUnless { it == Items.AIR }
     }
 }
