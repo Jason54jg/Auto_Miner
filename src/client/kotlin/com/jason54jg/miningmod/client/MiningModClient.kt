@@ -28,13 +28,10 @@ object MiningModClient : ClientModInitializer {
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             dispatcher.register(
-                ClientCommands.literal("miningmod")
-                    .then(
-                        ClientCommands.literal("config").executes {
-                            Minecraft.getInstance().gui.setScreen(MiningModConfigScreen(null))
-                            1
-                        }
-                    )
+                ClientCommands.literal("miningbot").executes {
+                    Minecraft.getInstance().gui.setScreen(MiningModConfigScreen(null))
+                    1
+                }
             )
         }
 

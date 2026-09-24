@@ -2,7 +2,7 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.15** (voir [CHANGELOG.md](CHANGELOG.md))
+Version actuelle : **0.0.17** (voir [CHANGELOG.md](CHANGELOG.md))
 
 ## Fonctionnalités
 
@@ -13,10 +13,11 @@ Version actuelle : **0.0.15** (voir [CHANGELOG.md](CHANGELOG.md))
   - **exception minerai** : si un minerai (vanilla ou tag `c:ores` pour la compatibilité avec d'autres mods) touche le tunnel, il est cassé avant de continuer, même s'il n'est pas exactement dans l'axe de percement.
 - Le minage respecte les règles normales de casse (outil, dureté du bloc, drops, XP) : ce n'est pas de la casse instantanée en survie.
 - S'arrête automatiquement sur un bloc incassable (bedrock, etc.) ou un liquide.
-- **Configurable pour serveurs non-vanilla** (`/miningmod config` ou bouton Mod Menu) :
+- **Configurable pour serveurs non-vanilla** (`/miningbot` ou bouton Mod Menu) :
   - `Portée` : distance d'anticipation du tunnel et de détection des minerais (utile si le joueur a une portée étendue par un autre mod/une capacité) ;
   - `Blocs/tick` : nombre de blocs pouvant être cassés en un seul tick (utile avec haste/efficacité ou une capacité de casse instantanée multiple) ;
-  - `Verrouiller le niveau Y` : le tunnel reste à la hauteur où le minage a été activé (strip mining en couche).
+  - `Verrouiller le niveau Y` + `Couche Y` : le tunnel reste à la hauteur choisie (-59, -54, -32, 0, 11, 15, 63) plutôt qu'à celle où le minage a été activé. Le mod descend automatiquement (casse le bloc sous les pieds, attend d'atterrir, recommence) jusqu'à cette couche avant de creuser à l'horizontale — pas un vrai pathfinding, juste une descente verticale, qui s'arrête net sur un bloc incassable ou un liquide.
+  - `Largeur du tunnel` (1/3/5 blocs) : élargit la zone minée latéralement (utile avec un outil qui a son propre effet de zone, ou juste pour creuser plus large).
   - Réglages sauvegardés dans `config/miningmod.json`.
 - **Alertes téléportation/mention** : un son (ding) et un flash rouge de l'écran pendant 3 secondes se déclenchent si :
   - le joueur se déplace de façon anormale en un seul tick (téléportation, TP admin, etc.) ;
@@ -25,7 +26,7 @@ Version actuelle : **0.0.15** (voir [CHANGELOG.md](CHANGELOG.md))
   - `Tout droit` (par défaut) : suit le regard, comme avant.
   - `Zigzag` : alterne tout droit / droite / tout droit / gauche tous les 6 blocs (tunnel en dents de scie).
   - `Cercle` : tourne à droite après chaque bras, longueur de bras croissante (spirale).
-  - En zigzag/cercle, la direction de minage est pilotée par le mod, indépendamment de là où le joueur regarde.
+  - En zigzag/cercle, la direction de minage est pilotée par le mod, qui tourne aussi la tête/vue du joueur pour suivre.
 - **Slot outil** (écran de config) : case cliquable qui capture l'objet actuellement en main du joueur comme outil de minage ; le mod l'équipe automatiquement depuis la hotbar avant de miner. Choix en mémoire seulement (non sauvegardé entre deux lancements du jeu).
 - **HUD de minage** (coin haut-gauche, visible pendant que le minage est actif) :
   - temps écoulé depuis l'activation ;

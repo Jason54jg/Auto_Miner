@@ -18,13 +18,15 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
     private val reachPresets = listOf(4.5, 8.0, 16.0, 32.0)
     private val blocksPerTickPresets = listOf(1, 2, 4, 8)
     private val patternPresets = MiningPattern.values().toList()
+    private val targetYPresets = listOf(-59, -54, -32, 0, 11, 15, 63)
+    private val tunnelWidthPresets = listOf(0, 1, 2)
 
     private var toolSlotX = 0
     private var toolSlotY = 0
 
     override fun init() {
         val centerX = width / 2
-        var y = height / 2 - 86
+        var y = height / 2 - 134
 
         addRenderableWidget(
             Button.builder(reachLabel()) {
@@ -54,6 +56,22 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
             Button.builder(lockYLabel()) {
                 config = config.copy(lockYLevel = !config.lockYLevel)
                 it.message = lockYLabel()
+            }.bounds(centerX - 100, y, 200, 20).build()
+        )
+        y += 24
+
+        addRenderableWidget(
+            Button.builder(targetYLabel()) {
+                config = config.copy(targetY = nextPreset(targetYPresets, config.targetY))
+                it.message = targetYLabel()
+            }.bounds(centerX - 100, y, 200, 20).build()
+        )
+        y += 24
+
+        addRenderableWidget(
+            Button.builder(tunnelWidthLabel()) {
+                config = config.copy(tunnelWidth = nextPreset(tunnelWidthPresets, config.tunnelWidth))
+                it.message = tunnelWidthLabel()
             }.bounds(centerX - 100, y, 200, 20).build()
         )
         y += 24
@@ -99,6 +117,8 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
     private fun reachLabel() = Component.literal("Portée : ${config.reach}")
     private fun blocksLabel() = Component.literal("Blocs/tick : ${config.blocksPerTick}")
     private fun lockYLabel() = Component.literal("Verrouiller le niveau Y : ${if (config.lockYLevel) "Oui" else "Non"}")
+    private fun targetYLabel() = Component.literal("Couche Y : ${config.targetY}")
+    private fun tunnelWidthLabel() = Component.literal("Largeur du tunnel : ${config.tunnelWidth * 2 + 1} bloc(s)")
     private fun patternLabel() = Component.literal("Style : ${patternName(config.pattern)}")
 
     private fun patternName(pattern: MiningPattern) = when (pattern) {

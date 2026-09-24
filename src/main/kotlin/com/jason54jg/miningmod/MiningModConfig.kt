@@ -18,6 +18,9 @@ data class MiningModConfig(
     var reach: Double = 4.5,
     var blocksPerTick: Int = 1,
     var lockYLevel: Boolean = false,
+    var targetY: Int = -59,
+    /** Rayon latéral du tunnel : 0 = 1 colonne (par défaut), 1 = 3 colonnes, 2 = 5 colonnes. */
+    var tunnelWidth: Int = 0,
     var pattern: MiningPattern = MiningPattern.STRAIGHT
 ) {
     companion object {

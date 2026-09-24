@@ -27,7 +27,6 @@ object AutoMiner {
 
     private var config = MiningModConfig.load()
     private var target: BlockPos? = null
-    private var lockedY: Int? = null
 
     // État du style de minage (zigzag / cercle) : direction courante et longueur du segment en cours.
     private var baseFacing: Direction? = null
@@ -46,7 +45,6 @@ object AutoMiner {
         if (active) {
             MiningStats.startSession()
             val player = client.player
-            lockedY = player?.blockPosition()?.y
             baseFacing = player?.direction
             currentFacing = baseFacing
             segmentSteps = 0
@@ -61,7 +59,6 @@ object AutoMiner {
     fun reset(client: Minecraft) {
         client.gameMode?.stopDestroyBlock()
         target = null
-        lockedY = null
         baseFacing = null
         currentFacing = null
     }
@@ -73,9 +70,48 @@ object AutoMiner {
         val gameMode = client.gameMode ?: return
 
         ensureToolEquipped(player)
+
+        if (config.lockYLevel && descendToTargetY(player, level, gameMode)) return
+
+        syncViewToFacing(player)
         repeat(config.blocksPerTick.coerceAtLeast(1)) {
             if (!mineOrAdvance(player, level, gameMode)) return
         }
+    }
+
+    /**
+     * Descend tout droit (casse le bloc sous les pieds, attend d'atterrir) jusqu'à la couche
+     * [MiningModConfig.targetY]. Ce n'est pas du vrai pathfinding : juste une descente verticale,
+     * qui s'arrête net si elle tombe sur un bloc incassable ou un liquide.
+     *
+     * @return vrai tant que la descente n'est pas terminée (le tunnel horizontal doit attendre).
+     */
+    private fun descendToTargetY(player: LocalPlayer, level: Level, gameMode: MultiPlayerGameMode): Boolean {
+        val current = player.blockPosition()
+        if (current.y <= config.targetY) return false
+        if (!player.onGround()) return true
+
+        val below = current.below()
+        if (!isBreakable(level, below)) return false
+
+        breakBlock(below, Direction.DOWN, level, gameMode)
+        return true
+    }
+
+    /** En zigzag/cercle, tourne la tête et le corps du joueur vers la direction pilotée par le mod. */
+    private fun syncViewToFacing(player: LocalPlayer) {
+        if (config.pattern == MiningPattern.STRAIGHT) return
+        val yaw = yawFor(currentFacing ?: return)
+        player.yRot = yaw
+        player.yHeadRot = yaw
+    }
+
+    private fun yawFor(direction: Direction): Float = when (direction) {
+        Direction.SOUTH -> 0f
+        Direction.WEST -> 90f
+        Direction.NORTH -> 180f
+        Direction.EAST -> 270f
+        else -> 0f
     }
 
     /** Équipe l'outil choisi dans la configuration s'il est présent dans la hotbar. */
@@ -95,14 +131,24 @@ object AutoMiner {
     private fun mineOrAdvance(player: LocalPlayer, level: Level, gameMode: MultiPlayerGameMode): Boolean {
         val facing = resolveFacing(player)
         val base = player.blockPosition()
-        val origin = if (config.lockYLevel) BlockPos(base.x, lockedY ?: base.y, base.z) else base
+        val origin = if (config.lockYLevel) BlockPos(base.x, config.targetY, base.z) else base
 
         val lookahead = config.reach.toInt().coerceIn(1, MAX_LOOKAHEAD)
+        val halfWidth = config.tunnelWidth.coerceIn(0, 2)
+        val lateralOffsets = -halfWidth..halfWidth
+
         val path = (1..lookahead).flatMap { step ->
             val forward = origin.relative(facing, step)
-            listOf(forward, forward.above())
+            lateralOffsets.flatMap { offset ->
+                val lateral = offsetPosition(forward, facing, offset)
+                listOf(lateral, lateral.above())
+            }
         }
-        val immediate = listOf(origin.relative(facing, 1), origin.relative(facing, 1).above())
+        val immediateForward = origin.relative(facing, 1)
+        val immediate = lateralOffsets.flatMap { offset ->
+            val lateral = offsetPosition(immediateForward, facing, offset)
+            listOf(lateral, lateral.above())
+        }
 
         val ores = path
             .flatMap { pos -> Direction.values().map(pos::relative) }
@@ -118,25 +164,39 @@ object AutoMiner {
             return false
         }
 
-        if (current != target) {
+        return breakBlock(current, facing, level, gameMode)
+    }
+
+    /** Décale [pos] latéralement par rapport à [facing] : positif = côté horaire, négatif = côté antihoraire. */
+    private fun offsetPosition(pos: BlockPos, facing: Direction, offset: Int): BlockPos {
+        if (offset == 0) return pos
+        val side = if (offset > 0) facing.clockWise else facing.counterClockWise
+        return pos.relative(side, kotlin.math.abs(offset))
+    }
+
+    /**
+     * Fait avancer la casse de [pos] d'un cran (démarre ou continue selon [target]).
+     * Se fie à l'état réel du bloc plutôt qu'à la valeur de retour de start/continueDestroyBlock :
+     * sur certaines versions, "true" ne veut pas forcément dire "détruit".
+     *
+     * @return vrai si le bloc est confirmé détruit.
+     */
+    private fun breakBlock(pos: BlockPos, facing: Direction, level: Level, gameMode: MultiPlayerGameMode): Boolean {
+        val brokenState = level.getBlockState(pos)
+        if (pos != target) {
             gameMode.stopDestroyBlock()
-            target = current
-            val brokenState = level.getBlockState(current)
-            if (gameMode.startDestroyBlock(current, facing.opposite)) {
-                target = null
-                MiningStats.recordBreak(brokenState, OreBlocks.isOre(brokenState))
-                return true
-            }
-            return false
+            target = pos
+            gameMode.startDestroyBlock(pos, facing.opposite)
+        } else {
+            gameMode.continueDestroyBlock(pos, facing.opposite)
         }
 
-        val brokenState = level.getBlockState(current)
-        if (gameMode.continueDestroyBlock(current, facing.opposite)) {
-            gameMode.stopDestroyBlock()
-            target = null
-            MiningStats.recordBreak(brokenState, OreBlocks.isOre(brokenState))
-        }
-        return false
+        if (!level.getBlockState(pos).isAir) return false
+
+        gameMode.stopDestroyBlock()
+        target = null
+        MiningStats.recordBreak(brokenState, OreBlocks.isOre(brokenState))
+        return true
     }
 
     private fun advance(player: LocalPlayer, level: Level, immediate: List<BlockPos>, facing: Direction) {

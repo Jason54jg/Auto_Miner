@@ -2,6 +2,17 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.17
+- `Verrouiller le niveau Y` a maintenant une vraie valeur associée : `Couche Y` dans la config (présélections : -59, -54, -32, 0, 11, 15, 63), au lieu de juste figer la hauteur où le joueur se trouvait au moment de l'activation.
+- Descente automatique vers la couche choisie avant de creuser à l'horizontale : casse le bloc sous les pieds, attend d'avoir atterri, recommence — jusqu'à atteindre la couche configurée. S'arrête net sur un bloc incassable ou un liquide. **Ce n'est pas du vrai pathfinding** (pas de contournement d'obstacles), juste une descente verticale contrôlée.
+- `Largeur du tunnel` dans la config (1/3/5 blocs) : élargit la zone minée latéralement, utile avec un outil qui a son propre effet de zone (ex. un enchantement "Excavation" côté serveur) ou simplement pour creuser plus large.
+- Refactor interne : la logique de casse d'un bloc (démarrer/continuer/confirmer) est maintenant partagée entre le tunnel horizontal et la descente verticale (`AutoMiner.breakBlock`).
+
+## 0.0.16
+- Fix minage : le minage ne se fiait qu'à la valeur de retour de `startDestroyBlock`/`continueDestroyBlock` pour savoir si un bloc était cassé (compteur HUD incrémenté, animation de bras, mais rien ne cassait réellement). Vérifie maintenant l'état réel du bloc (`isAir`) après chaque appel, quelle que soit la sémantique exacte du retour.
+- Commande : `/miningmod config` → `/miningbot` (commande directe, plus de sous-commande `config`).
+- Zigzag/cercle : le joueur tourne maintenant la tête et le corps pour suivre la direction pilotée par le mod (avant, seuls le déplacement et le minage tournaient, pas la caméra).
+
 ## 0.0.15
 - **X-ray entièrement supprimé** (fichiers, config, écran, appels) : `XrayRenderer.kt`, `XrayScanner.kt` supprimés ; `XrayPreset` et le champ `xrayPreset` retirés de la config ; bouton et libellé retirés de l'écran de configuration ; `OreBlocks.VALUABLE` retiré (n'était utilisé que par le x-ray, `OreBlocks.ALL` reste utilisé par le minage auto).
 
