@@ -2,6 +2,9 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.33
+- Fix compile : `Player.displayClientMessage(Component, Boolean)` a disparu en 26.2, scindé en `sendSystemMessage(Component)` (chat) et `sendOverlayMessage(Component)` (action bar). Le message d'activation/désactivation utilise maintenant `sendSystemMessage`.
+
 ## 0.0.32
 - Message dans le chat à chaque appui sur la touche d'activation ("Minage automatique activé"/"désactivé") — s'affiche aussi quand le minage se coupe tout seul sur obstacle (0.0.30).
 

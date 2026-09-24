@@ -66,9 +66,8 @@ object AutoMiner {
 
     fun toggle(client: Minecraft) {
         active = !active
-        client.player?.displayClientMessage(
-            Component.literal(if (active) "Minage automatique activé" else "Minage automatique désactivé"),
-            false
+        client.player?.sendSystemMessage(
+            Component.literal(if (active) "Minage automatique activé" else "Minage automatique désactivé")
         )
         if (active) {
             MiningStats.startSession()
