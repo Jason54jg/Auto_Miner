@@ -2,6 +2,9 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.8
+- Fix build : `AutoMiner.kt` et `XrayScanner.kt` déplacés de `src/main/kotlin` vers `src/client/kotlin`. Ils utilisent des classes client-only (`Minecraft`, `LocalPlayer`, `MultiPlayerGameMode`) qui n'existent pas sur le classpath du source set `main` avec `splitEnvironmentSourceSets()` — confirmé par une vraie erreur de compilation locale (`Unresolved reference`). Package inchangé (`com.jason54jg.miningmod`), donc aucun import à modifier ailleurs.
+
 ## 0.0.7
 - Fix build : ajout du repository Maven de TerraformersMC (`https://maven.terraformersmc.com/releases/`) dans `build.gradle`. Mod Menu n'est ni sur le Maven de Fabric ni sur Maven Central, `compileOnly "com.terraformersmc:modmenu:..."` ne pouvait pas se résoudre sans ce repository. Confirmé par un vrai build local (le reste — Loom, Fabric API, Fabric Language Kotlin, Java 25 — résolvait déjà correctement).
 

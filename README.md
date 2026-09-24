@@ -2,7 +2,7 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.7** (voir [CHANGELOG.md](CHANGELOG.md))
+Version actuelle : **0.0.8** (voir [CHANGELOG.md](CHANGELOG.md))
 
 ## Fonctionnalités
 
@@ -64,8 +64,8 @@ Le `.jar` généré se trouve dans `build/libs/`.
 
 ```
 src/
-├── main/kotlin/...    # Logique commune + AutoMiner (mod initializer)
-├── client/kotlin/...  # Keybind + boucle de tick (client uniquement)
+├── main/kotlin/...    # Données/logique communes (config, stats, mod initializer) — pas de classes client-only
+├── client/kotlin/...  # AutoMiner, x-ray, keybind, HUD, écrans (tout ce qui touche Minecraft/LocalPlayer/rendu)
 └── main/resources/    # fabric.mod.json, lang
 ```
 
