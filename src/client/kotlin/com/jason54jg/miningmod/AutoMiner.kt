@@ -1,5 +1,6 @@
 package com.jason54jg.miningmod
 
+import com.jason54jg.miningmod.client.AlertManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.MultiPlayerGameMode
 import net.minecraft.client.player.LocalPlayer
@@ -39,11 +40,16 @@ object AutoMiner {
     // Vitesse verticale d'un saut vanilla (sans effet de saut) : utilisée pour franchir un trou d'un seul bloc.
     private const val JUMP_VELOCITY = 0.42
 
+    // Nombre de ticks d'affilée sans casser ni avancer avant de conclure à un obstacle réel
+    // (mur incassable, liquide sans minerai autour...) plutôt qu'un blocage transitoire d'un tick.
+    private const val STUCK_THRESHOLD = 20
+
     var active = false
         private set
 
     private var config = MiningModConfig.load()
     private var target: BlockPos? = null
+    private var stuckTicks = 0
 
     // État du style de minage (zigzag / cercle) : direction courante et longueur du segment en cours.
     private var baseFacing: Direction? = null
@@ -68,6 +74,7 @@ object AutoMiner {
             segmentLength = if (config.pattern == MiningPattern.CIRCLE) CIRCLE_INITIAL_LENGTH else ZIGZAG_FORWARD_LENGTH
             zigzagPhase = 0
             spiralLegCount = 0
+            stuckTicks = 0
         } else {
             reset(client)
         }
@@ -78,6 +85,7 @@ object AutoMiner {
         target = null
         baseFacing = null
         currentFacing = null
+        stuckTicks = 0
     }
 
     fun tick(client: Minecraft) {
@@ -87,13 +95,29 @@ object AutoMiner {
         val gameMode = client.gameMode ?: return
 
         ensureToolEquipped(player)
+        // Toujours synchronisée, même pendant la descente Y ou une chute : sinon la tête reste
+        // figée dans la direction où le joueur regardait au moment de la chute.
+        syncViewToFacing(player)
 
         if (config.lockYLevel && descendToTargetY(player, level, gameMode)) return
 
-        syncViewToFacing(player)
         repeat(config.blocksPerTick.coerceAtLeast(1)) {
-            if (!mineOrAdvance(player, level, gameMode)) return
+            if (!mineOrAdvance(player, level, gameMode)) {
+                reactIfStuck(client)
+                return
+            }
         }
+    }
+
+    /**
+     * Rien à casser ni à avancer pendant [STUCK_THRESHOLD] ticks d'affilée (mur incassable, liquide
+     * sans minerai autour...) : plutôt que de rester bloqué en silence indéfiniment, coupe le
+     * minage et alerte le joueur (son + flash), comme pour une téléportation/mention.
+     */
+    private fun reactIfStuck(client: Minecraft) {
+        if (stuckTicks < STUCK_THRESHOLD) return
+        toggle(client)
+        AlertManager.notifyStuck(client)
     }
 
     /**
@@ -180,11 +204,16 @@ object AutoMiner {
         val immediateFeet = lateralOffsets.map { offset -> offsetPosition(immediateForward, facing, offset) }
         val immediate = immediateFeet.flatMap { listOf(it, it.above()) }
 
+        // Ne jamais casser le bloc qui porte le joueur : sinon un minerai/bloc obligatoire détecté
+        // juste sous les pieds le fait tomber dans le vide au lieu de continuer à miner.
+        val standingOn = base.below()
+
         val touchingOres = path
             .flatMap { pos -> Direction.values().map(pos::relative) }
-            .filter { pos -> pos !in path && isVanillaOre(level.getBlockState(pos)) }
+            .filter { pos -> pos !in path && pos != standingOn && isVanillaOre(level.getBlockState(pos)) }
             .distinct()
         val nearbyCustomBlocks = scanForCustomBlock(level, origin, lookahead)
+            .filter { it != standingOn }
             .sortedBy { it.distSqr(origin) }
 
         val current = target?.takeIf { isBreakable(level, it) }
@@ -192,10 +221,11 @@ object AutoMiner {
 
         if (current == null) {
             target = null
-            advance(player, level, immediate, immediateFeet, facing)
+            stuckTicks = if (advance(player, level, immediate, immediateFeet, facing)) 0 else stuckTicks + 1
             return false
         }
 
+        stuckTicks = 0
         return breakBlock(current, facing, level, gameMode)
     }
 
@@ -254,20 +284,25 @@ object AutoMiner {
         return positions.filter { pos -> isCustomBlock(level.getBlockState(pos)) }
     }
 
-    private fun advance(player: LocalPlayer, level: Level, immediate: List<BlockPos>, feet: List<BlockPos>, facing: Direction) {
-        if (immediate.any { !level.getBlockState(it).isAir }) return
+    /** @return vrai si le joueur a effectivement avancé (ou sauté), faux si un obstacle bloque le passage. */
+    private fun advance(player: LocalPlayer, level: Level, immediate: List<BlockPos>, feet: List<BlockPos>, facing: Direction): Boolean {
+        if (immediate.any { !level.getBlockState(it).isAir }) return false
 
         var verticalMotion = player.deltaMovement.y
-        if (feet.any { level.getBlockState(it.below()).isAir }) {
+        // Sans verrouillage de couche Y, aucune hauteur à maintenir : le bot ignore les trous et
+        // laisse la gravité faire son travail au lieu de sauter/s'arrêter (le bloc devant, lui,
+        // reste cassé normalement quoi qu'il arrive : voir mineOrAdvance).
+        if (config.lockYLevel && feet.any { level.getBlockState(it.below()).isAir }) {
             // Trou d'un seul bloc de large : saute par-dessus plutôt que de s'arrêter. Un trou plus large
             // (pas de sol non plus deux blocs après) reste bloquant : on attend/mine plutôt que de tomber.
             val landing = feet.map { it.relative(facing, 1) }
-            if (landing.any { level.getBlockState(it.below()).isAir }) return
+            if (landing.any { level.getBlockState(it.below()).isAir }) return false
             if (player.onGround()) verticalMotion = JUMP_VELOCITY
         }
 
         player.deltaMovement = Vec3(facing.stepX * WALK_SPEED, verticalMotion, facing.stepZ * WALK_SPEED)
         onAdvanced()
+        return true
     }
 
     /** Direction de minage/déplacement effective : figée à l'activation, jamais celle du regard en direct. */

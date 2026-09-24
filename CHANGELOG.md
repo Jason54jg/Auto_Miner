@@ -2,6 +2,16 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.31
+- L'esquive de trou (saut ou arrêt) ne s'applique plus que si `Verrouiller le niveau Y` est actif. Sans verrouillage, pas de couche à maintenir : le bot ignore les trous et tombe dedans en continuant d'avancer, tout en cassant normalement le bloc devant lui s'il y en a un.
+
+## 0.0.30
+- Fix : face à un obstacle réel (bloc incassable, liquide sans minerai autour, trou trop large sans minerai), le mod restait actif mais ne faisait plus rien du tout, en silence, indéfiniment. Après 20 ticks (~1s) sans casser ni avancer, le minage se coupe automatiquement et alerte le joueur (son + flash), comme pour une téléportation/mention.
+
+## 0.0.29
+- Fix important : le mod pouvait casser le bloc qui porte le joueur (minerai/bloc obligatoire détecté juste sous les pieds), le faisant tomber dans le vide/une caverne — surtout depuis le scan large du bloc obligatoire. Ce bloc est maintenant systématiquement exclu des cibles.
+- Fix caméra : la tête ne suivait plus la direction figée pendant une descente Y (ou une chute) — `syncViewToFacing` tourne maintenant à chaque tick, plus seulement quand la descente est terminée.
+
 ## 0.0.28
 - Le scan large (cube autour du joueur, toutes directions) est maintenant réservé au **bloc obligatoire**. Les minerais vanilla/tag reviennent à l'ancien comportement "touche le tunnel" — sinon un minerai croisé dans un mur à distance trouait le tunnel au hasard. Pas de scan du tout si aucun bloc obligatoire n'est choisi (évite le coût du cube pour rien).
 

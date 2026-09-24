@@ -2,7 +2,7 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.28** (voir [CHANGELOG.md](CHANGELOG.md))
+Version actuelle : **0.0.31** (voir [CHANGELOG.md](CHANGELOG.md))
 
 ## Fonctionnalités
 
@@ -13,7 +13,7 @@ Version actuelle : **0.0.28** (voir [CHANGELOG.md](CHANGELOG.md))
   - **exception minerai** : un minerai (vanilla ou tag `c:ores` pour la compatibilité avec d'autres mods) qui touche le tunnel est cassé avant de continuer, même s'il n'est pas exactement dans l'axe de percement. Le **bloc obligatoire**, lui, est détecté à portée tout autour du joueur (devant, derrière, sur les côtés, au-dessus, en dessous), pas seulement s'il touche le tunnel.
   - le joueur n'a plus rien à faire une fois activé : le mod pilote entièrement le déplacement **et** la caméra, aucun mouvement ni visée n'est nécessaire.
 - Le minage respecte les règles normales de casse (outil, dureté du bloc, drops, XP) : ce n'est pas de la casse instantanée en survie.
-- S'arrête automatiquement sur un bloc incassable (bedrock, etc.) ou un liquide.
+- S'arrête automatiquement sur un bloc incassable (bedrock, etc.) ou un liquide : après ~1s sans casser ni avancer, le minage se coupe tout seul et alerte le joueur (son + flash), au lieu de rester bloqué en silence.
 - **Configurable pour serveurs non-vanilla** (`/miningbot` ou bouton Mod Menu) :
   - `Portée`, `Blocs/tick`, `Couche Y` et `Largeur du tunnel` sont des champs de texte libres (n'importe quelle valeur, pas juste des présélections) ;
   - `Portée` : distance d'anticipation du tunnel et de détection des minerais (utile si le joueur a une portée étendue par un autre mod/une capacité) ;
@@ -30,7 +30,8 @@ Version actuelle : **0.0.28** (voir [CHANGELOG.md](CHANGELOG.md))
   - `Zigzag` : longues lignes droites (12 blocs) entrecoupées de petits crans latéraux courts (2 blocs) — mouvement doux, sans partir complètement à droite ou à gauche.
   - `Cercle` : tourne à droite après chaque bras ; bras assez longs dès le départ, qui grandissent lentement (spirale progressive, pas de virages serrés).
   - Dans tous les styles, la direction de minage est entièrement pilotée par le mod (figée dès l'activation, plus jamais liée au regard en direct) et la caméra suit automatiquement — en ligne droite elle reste fixe, en zigzag/cercle elle ne tourne jamais de plus de 30° par rapport à la direction de départ, pour rester dans le champ de vision (même quand le tunnel fait un cran à 90°).
-- Le bot ne marche pas dans le vide : s'il n'y a pas de sol devant (trou, ravin), il saute par-dessus si le trou fait 1 bloc de large, sinon il s'arrête au lieu de tomber.
+- Le bot ne marche pas dans le vide **si `Verrouiller le niveau Y` est actif** : sans sol devant (trou, ravin), il saute par-dessus si le trou fait 1 bloc de large, sinon il s'arrête au lieu de tomber. Sans verrouillage, aucune couche à maintenir : il ignore les trous et se laisse tomber dedans en continuant tout droit — le bloc devant lui, s'il y en a un, est cassé normalement dans tous les cas.
+- Le bloc qui porte le joueur n'est jamais cassé, même s'il correspond à un minerai/bloc obligatoire détecté juste sous les pieds — évite de tomber dans le vide en minant son propre plancher.
 - **Touche "libérer la souris"** (`key.miningmod.ungrab`, par défaut `N`) : évite qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille.
 - **Slot outil** (écran de config) : case cliquable qui capture l'objet actuellement en main du joueur comme outil de minage ; le mod l'équipe automatiquement depuis la hotbar avant de miner. Choix en mémoire seulement (non sauvegardé entre deux lancements du jeu).
 - **HUD de minage** (coin haut-gauche, visible pendant que le minage est actif) :

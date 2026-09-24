@@ -37,6 +37,11 @@ object AlertManager {
         }
     }
 
+    /** Le minage vient de s'arrêter tout seul faute de pouvoir avancer (obstacle incassable, coincé...). */
+    fun notifyStuck(client: Minecraft) {
+        trigger(client)
+    }
+
     private fun trigger(client: Minecraft) {
         client.soundManager.play(SimpleSoundInstance.forUI(SoundEvents.EXPERIENCE_ORB_PICKUP, 1f))
         ScreenFlash.start()
