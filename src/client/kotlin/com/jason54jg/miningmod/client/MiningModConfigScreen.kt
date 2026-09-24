@@ -4,6 +4,7 @@ import com.jason54jg.miningmod.AutoMiner
 import com.jason54jg.miningmod.MiningModConfig
 import com.jason54jg.miningmod.MiningPattern
 import com.jason54jg.miningmod.ToolSelection
+import com.jason54jg.miningmod.XrayPreset
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
@@ -18,13 +19,14 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
     private val reachPresets = listOf(4.5, 8.0, 16.0, 32.0)
     private val blocksPerTickPresets = listOf(1, 2, 4, 8)
     private val patternPresets = MiningPattern.values().toList()
+    private val xrayPresets = XrayPreset.values().toList()
 
     private var toolSlotX = 0
     private var toolSlotY = 0
 
     override fun init() {
         val centerX = width / 2
-        var y = height / 2 - 86
+        var y = height / 2 - 110
 
         addRenderableWidget(
             Button.builder(reachLabel()) {
@@ -54,6 +56,14 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
             Button.builder(lockYLabel()) {
                 config = config.copy(lockYLevel = !config.lockYLevel)
                 it.message = lockYLabel()
+            }.bounds(centerX - 100, y, 200, 20).build()
+        )
+        y += 24
+
+        addRenderableWidget(
+            Button.builder(xrayLabel()) {
+                config = config.copy(xrayPreset = nextPreset(xrayPresets, config.xrayPreset))
+                it.message = xrayLabel()
             }.bounds(centerX - 100, y, 200, 20).build()
         )
         y += 24
@@ -100,11 +110,18 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
     private fun blocksLabel() = Component.literal("Blocs/tick : ${config.blocksPerTick}")
     private fun lockYLabel() = Component.literal("Verrouiller le niveau Y : ${if (config.lockYLevel) "Oui" else "Non"}")
     private fun patternLabel() = Component.literal("Style : ${patternName(config.pattern)}")
+    private fun xrayLabel() = Component.literal("Voir à travers les murs : ${xrayName(config.xrayPreset)}")
 
     private fun patternName(pattern: MiningPattern) = when (pattern) {
         MiningPattern.STRAIGHT -> "Tout droit"
         MiningPattern.ZIGZAG -> "Zigzag (gauche/droite)"
         MiningPattern.CIRCLE -> "Cercle (spirale)"
+    }
+
+    private fun xrayName(preset: XrayPreset) = when (preset) {
+        XrayPreset.NONE -> "Désactivé"
+        XrayPreset.VALUABLE -> "Précieux (diamant/émeraude/débris)"
+        XrayPreset.ALL -> "Tous les minerais"
     }
 
     private fun toolName(tool: Item?): String {

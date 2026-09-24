@@ -2,7 +2,7 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.5** (voir [CHANGELOG.md](CHANGELOG.md))
+Version actuelle : **0.0.6** (voir [CHANGELOG.md](CHANGELOG.md))
 
 ## Fonctionnalités
 
@@ -31,6 +31,9 @@ Version actuelle : **0.0.5** (voir [CHANGELOG.md](CHANGELOG.md))
   - temps écoulé depuis l'activation ;
   - nombre total de blocs cassés ;
   - détail par type de minerai cassé (les variantes deepslate sont fusionnées avec le minerai de base).
+- **X-ray minerais** (`Voir à travers les murs` dans la config) : contours rouges visibles à travers les murs pour les minerais choisis, dans un rayon de 16 blocs autour du joueur (rescan chaque seconde).
+  - Désactivé (par défaut) / Précieux (diamant, émeraude, débris antique) / Tous les minerais.
+  - ⚠️ **Expérimental** : cette fonctionnalité utilise l'API de rendu 3D bas niveau de Minecraft 26.2 (`RenderPipeline`/`RenderType`), entièrement réécrite dans cette version. Impossible de la compiler dans l'environnement de développement de ce projet pour la vérifier (pas d'accès réseau à Mojang/Fabric, pas de JDK 25) — c'est le point du mod le plus susceptible de demander une correction manuelle (voir `XrayRenderer.kt`).
 
 ## Prérequis
 

@@ -1,6 +1,7 @@
 package com.jason54jg.miningmod.client
 
 import com.jason54jg.miningmod.AutoMiner
+import com.jason54jg.miningmod.XrayScanner
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -23,6 +24,7 @@ object MiningModClient : ClientModInitializer {
             while (toggleKey.consumeClick()) AutoMiner.toggle(client)
             AutoMiner.tick(client)
             client.player?.let(AlertManager::checkTeleport)
+            XrayScanner.tick(client, AutoMiner.currentConfig())
         }
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
@@ -47,5 +49,7 @@ object MiningModClient : ClientModInitializer {
         HudElementRegistry.addLast(Identifier.of("miningmod", "alert_flash")) { graphics, _ ->
             ScreenFlash.render(graphics)
         }
+
+        XrayRenderer.register()
     }
 }

@@ -1,14 +1,11 @@
 package com.jason54jg.miningmod
 
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.MultiPlayerGameMode
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 
 /**
@@ -24,19 +21,6 @@ object AutoMiner {
     private const val WALK_SPEED = 0.2
     private const val MAX_LOOKAHEAD = 6
     private const val ZIGZAG_SEGMENT_LENGTH = 6
-
-    private val ORE_BLOCKS = setOf(
-        Blocks.COAL_ORE, Blocks.DEEPSLATE_COAL_ORE,
-        Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE,
-        Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE,
-        Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE,
-        Blocks.REDSTONE_ORE, Blocks.DEEPSLATE_REDSTONE_ORE,
-        Blocks.LAPIS_ORE, Blocks.DEEPSLATE_LAPIS_ORE,
-        Blocks.DIAMOND_ORE, Blocks.DEEPSLATE_DIAMOND_ORE,
-        Blocks.EMERALD_ORE, Blocks.DEEPSLATE_EMERALD_ORE,
-        Blocks.NETHER_GOLD_ORE, Blocks.NETHER_QUARTZ_ORE,
-        Blocks.ANCIENT_DEBRIS
-    )
 
     var active = false
         private set
@@ -56,6 +40,8 @@ object AutoMiner {
     fun applyConfig(newConfig: MiningModConfig) {
         config = newConfig
     }
+
+    fun currentConfig(): MiningModConfig = config
 
     fun toggle(client: Minecraft) {
         active = !active
@@ -122,7 +108,7 @@ object AutoMiner {
 
         val ores = path
             .flatMap { pos -> Direction.values().map(pos::relative) }
-            .filter { pos -> pos !in path && isOre(level.getBlockState(pos)) }
+            .filter { pos -> pos !in path && OreBlocks.isOre(level.getBlockState(pos)) }
             .distinct()
 
         val current = target?.takeIf { isBreakable(level, it) }
@@ -140,7 +126,7 @@ object AutoMiner {
             val brokenState = level.getBlockState(current)
             if (gameMode.startDestroyBlock(current, facing.opposite)) {
                 target = null
-                MiningStats.recordBreak(brokenState, isOre(brokenState))
+                MiningStats.recordBreak(brokenState, OreBlocks.isOre(brokenState))
                 return true
             }
             return false
@@ -150,7 +136,7 @@ object AutoMiner {
         if (gameMode.continueDestroyBlock(current, facing.opposite)) {
             gameMode.stopDestroyBlock()
             target = null
-            MiningStats.recordBreak(brokenState, isOre(brokenState))
+            MiningStats.recordBreak(brokenState, OreBlocks.isOre(brokenState))
         }
         return false
     }
@@ -203,10 +189,5 @@ object AutoMiner {
         val state = level.getBlockState(pos)
         if (state.isAir || !state.fluidState.isEmpty) return false
         return state.getDestroySpeed(level, pos) >= 0f
-    }
-
-    private fun isOre(state: BlockState): Boolean {
-        if (ORE_BLOCKS.contains(state.block)) return true
-        return state.`is`(ConventionalBlockTags.ORES)
     }
 }
