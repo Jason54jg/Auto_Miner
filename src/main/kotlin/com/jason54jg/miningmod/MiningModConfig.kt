@@ -4,12 +4,6 @@ import com.google.gson.GsonBuilder
 import net.fabricmc.loader.api.FabricLoader
 import java.nio.file.Files
 
-enum class MiningPattern {
-    STRAIGHT,
-    ZIGZAG,
-    CIRCLE
-}
-
 /**
  * Réglages persistés du mod, pour s'adapter aux serveurs non-vanilla
  * (portée étendue, capacités de casse multiple, etc.).
@@ -21,7 +15,6 @@ data class MiningModConfig(
     var targetY: Int = -59,
     /** Rayon latéral du tunnel : 0 = 1 colonne (par défaut), 1 = 3 colonnes, 2 = 5 colonnes. */
     var tunnelWidth: Int = 0,
-    var pattern: MiningPattern = MiningPattern.STRAIGHT,
     /** Identifiant ("namespace:path") de l'outil/du bloc obligatoire choisis, pour survivre à un redémarrage. */
     var toolItemId: String? = null,
     var customBlockId: String? = null

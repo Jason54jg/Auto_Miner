@@ -3,7 +3,6 @@ package com.jason54jg.miningmod.client
 import com.jason54jg.miningmod.AutoMiner
 import com.jason54jg.miningmod.CustomOreSelection
 import com.jason54jg.miningmod.MiningModConfig
-import com.jason54jg.miningmod.MiningPattern
 import com.jason54jg.miningmod.ToolSelection
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -19,8 +18,6 @@ import net.minecraft.world.phys.BlockHitResult
 
 class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.literal("Mining Mod")) {
     private var config = MiningModConfig.load()
-
-    private val patternPresets = MiningPattern.values().toList()
 
     private var reachRowY = 0
     private var blocksRowY = 0
@@ -45,14 +42,6 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
         addRenderableWidget(numberField(centerX + 10, y, config.blocksPerTick.toString()) { text ->
             text.toIntOrNull()?.let { config = config.copy(blocksPerTick = it.coerceAtLeast(1)) }
         })
-        y += 24
-
-        addRenderableWidget(
-            Button.builder(patternLabel()) {
-                config = config.copy(pattern = nextPreset(patternPresets, config.pattern))
-                it.message = patternLabel()
-            }.bounds(centerX - 100, y, 200, 20).build()
-        )
         y += 24
 
         addRenderableWidget(
@@ -153,13 +142,6 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
     }
 
     private fun lockYLabel() = Component.literal("Verrouiller le niveau Y : ${if (config.lockYLevel) "Oui" else "Non"}")
-    private fun patternLabel() = Component.literal("Style : ${patternName(config.pattern)}")
-
-    private fun patternName(pattern: MiningPattern) = when (pattern) {
-        MiningPattern.STRAIGHT -> "Tout droit"
-        MiningPattern.ZIGZAG -> "Zigzag (gauche/droite)"
-        MiningPattern.CIRCLE -> "Cercle (spirale)"
-    }
 
     private fun toolName(tool: Item?): String {
         if (tool == null) return "main (aucun choisi)"
@@ -169,10 +151,5 @@ class MiningModConfigScreen(private val parent: Screen?) : Screen(Component.lite
     private fun oreName(block: Block?): String {
         if (block == null) return "aucun"
         return BuiltInRegistries.BLOCK.getKey(block).path.replace('_', ' ')
-    }
-
-    private fun <T> nextPreset(presets: List<T>, current: T): T {
-        val index = presets.indexOf(current)
-        return presets[(index + 1).mod(presets.size)]
     }
 }

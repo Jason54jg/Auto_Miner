@@ -12,31 +12,15 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 
 /**
- * Creuse dans la direction regardée par le joueur (ou selon le style choisi) tant que [active] est vrai,
- * en cassant systématiquement tout minerai touchant le tunnel avant d'avancer.
+ * Creuse tout droit dans la direction figée à l'activation tant que [active] est vrai, en cassant
+ * systématiquement tout minerai touchant le tunnel avant d'avancer.
  *
  * [config] permet de s'adapter à un serveur non-vanilla (portée étendue, capacités
- * de casse instantanée multiple, verrouillage du niveau Y pour du strip mining) et de
- * choisir un style de minage ([MiningPattern.STRAIGHT] tout droit, [MiningPattern.ZIGZAG]
- * de gauche à droite, [MiningPattern.CIRCLE] en spirale).
+ * de casse instantanée multiple, verrouillage du niveau Y pour du strip mining).
  */
 object AutoMiner {
     private const val WALK_SPEED = 0.2
     private const val MAX_LOOKAHEAD = 6
-
-    // En zigzag : longues lignes droites entrecoupées de petits crans latéraux courts,
-    // pour un mouvement doux plutôt que des virages à 90° marqués.
-    private const val ZIGZAG_FORWARD_LENGTH = 12
-    private const val ZIGZAG_LATERAL_LENGTH = 2
-
-    // En cercle : des bras assez longs dès le départ et une croissance lente, pour une
-    // spirale qui s'ouvre progressivement au lieu de tourner sur elle-même trop vite.
-    private const val CIRCLE_INITIAL_LENGTH = 8
-    private const val CIRCLE_LEGS_BEFORE_GROWTH = 4
-
-    // La caméra ne tourne jamais de plus de cet angle par rapport à la direction de départ,
-    // même si le tunnel fait un cran à 90° : reste dans le champ de vision du joueur.
-    private const val MAX_VIEW_DEVIATION = 30f
 
     // Vitesse verticale d'un saut vanilla (sans effet de saut) : utilisée pour franchir un trou d'un seul bloc.
     private const val JUMP_VELOCITY = 0.42
@@ -52,13 +36,8 @@ object AutoMiner {
     private var target: BlockPos? = null
     private var stuckTicks = 0
 
-    // État du style de minage (zigzag / cercle) : direction courante et longueur du segment en cours.
+    // Direction figée à l'activation : jamais celle du regard en direct.
     private var baseFacing: Direction? = null
-    private var currentFacing: Direction? = null
-    private var segmentSteps = 0
-    private var segmentLength = ZIGZAG_FORWARD_LENGTH
-    private var zigzagPhase = 0
-    private var spiralLegCount = 0
 
     fun applyConfig(newConfig: MiningModConfig) {
         config = newConfig
@@ -71,13 +50,7 @@ object AutoMiner {
         )
         if (active) {
             MiningStats.startSession()
-            val player = client.player
-            baseFacing = player?.direction
-            currentFacing = baseFacing
-            segmentSteps = 0
-            segmentLength = if (config.pattern == MiningPattern.CIRCLE) CIRCLE_INITIAL_LENGTH else ZIGZAG_FORWARD_LENGTH
-            zigzagPhase = 0
-            spiralLegCount = 0
+            baseFacing = client.player?.direction
             stuckTicks = 0
         } else {
             reset(client)
@@ -88,7 +61,6 @@ object AutoMiner {
         client.gameMode?.stopDestroyBlock()
         target = null
         baseFacing = null
-        currentFacing = null
         stuckTicks = 0
     }
 
@@ -145,15 +117,10 @@ object AutoMiner {
 
     /**
      * Le mod pilote entièrement la caméra : aucun mouvement du joueur n'est nécessaire une fois
-     * le minage activé. En ligne droite, la vue reste figée sur la direction de départ. En
-     * zigzag/cercle, elle suit la direction pilotée par le mod sans jamais dépasser
-     * [MAX_VIEW_DEVIATION] par rapport à cette même direction de départ : le tunnel peut faire des
-     * crans à 90°, la caméra reste dans le champ de vision d'origine du joueur.
+     * le minage activé. La vue reste figée sur la direction de départ.
      */
     private fun syncViewToFacing(player: LocalPlayer) {
-        val base = yawFor(baseFacing ?: return)
-        val target = if (config.pattern == MiningPattern.STRAIGHT) base else yawFor(currentFacing ?: return)
-        val yaw = base + clampAngleDelta(target - base, MAX_VIEW_DEVIATION)
+        val yaw = yawFor(baseFacing ?: return)
         player.yRot = yaw
         player.yHeadRot = yaw
     }
@@ -164,14 +131,6 @@ object AutoMiner {
         Direction.NORTH -> 180f
         Direction.EAST -> 270f
         else -> 0f
-    }
-
-    /** Ramène [delta] (en degrés) dans (-180, 180], puis le limite à ±[max]. */
-    private fun clampAngleDelta(delta: Float, max: Float): Float {
-        var normalized = delta % 360f
-        if (normalized > 180f) normalized -= 360f
-        if (normalized < -180f) normalized += 360f
-        return normalized.coerceIn(-max, max)
     }
 
     /** Équipe l'outil choisi dans la configuration s'il est présent dans la hotbar. */
@@ -305,47 +264,11 @@ object AutoMiner {
         }
 
         player.deltaMovement = Vec3(facing.stepX * WALK_SPEED, verticalMotion, facing.stepZ * WALK_SPEED)
-        onAdvanced()
         return true
     }
 
     /** Direction de minage/déplacement effective : figée à l'activation, jamais celle du regard en direct. */
-    private fun resolveFacing(player: LocalPlayer): Direction {
-        if (config.pattern == MiningPattern.STRAIGHT) return baseFacing ?: player.direction
-        return currentFacing ?: player.direction
-    }
-
-    /** Fait tourner la direction courante une fois le segment (zigzag) ou le bras de spirale (cercle) terminé. */
-    private fun onAdvanced() {
-        if (config.pattern == MiningPattern.STRAIGHT) return
-
-        segmentSteps++
-        if (segmentSteps < segmentLength) return
-        segmentSteps = 0
-
-        val facing = currentFacing ?: baseFacing ?: return
-        when (config.pattern) {
-            MiningPattern.ZIGZAG -> {
-                val forward = baseFacing ?: facing
-                zigzagPhase = (zigzagPhase + 1) % 4
-                currentFacing = when (zigzagPhase) {
-                    1 -> forward.clockWise
-                    3 -> forward.counterClockWise
-                    else -> forward
-                }
-                segmentLength = if (zigzagPhase % 2 == 0) ZIGZAG_FORWARD_LENGTH else ZIGZAG_LATERAL_LENGTH
-            }
-            MiningPattern.CIRCLE -> {
-                currentFacing = facing.clockWise
-                spiralLegCount++
-                if (spiralLegCount >= CIRCLE_LEGS_BEFORE_GROWTH) {
-                    spiralLegCount = 0
-                    segmentLength++
-                }
-            }
-            MiningPattern.STRAIGHT -> Unit
-        }
-    }
+    private fun resolveFacing(player: LocalPlayer): Direction = baseFacing ?: player.direction
 
     private fun isBreakable(level: Level, pos: BlockPos): Boolean {
         val state = level.getBlockState(pos)

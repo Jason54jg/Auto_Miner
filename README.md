@@ -2,7 +2,7 @@
 
 Mod Fabric pour Minecraft **26.2** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.33** (voir [CHANGELOG.md](CHANGELOG.md))
+Version actuelle : **0.0.34** (voir [CHANGELOG.md](CHANGELOG.md))
 
 ## Fonctionnalités
 
@@ -25,11 +25,7 @@ Version actuelle : **0.0.33** (voir [CHANGELOG.md](CHANGELOG.md))
 - **Alertes téléportation/mention** (actives uniquement pendant que le minage tourne) : un son (ding) et un flash rouge de l'écran pendant 3 secondes se déclenchent si :
   - le joueur se déplace de façon anormale en un seul tick (téléportation, TP admin, etc.) ;
   - le pseudo du joueur apparaît dans un message de chat reçu (mention).
-- **Style de minage** (`pattern` dans la config) :
-  - `Tout droit` (par défaut) : garde la direction regardée au moment de l'activation.
-  - `Zigzag` : longues lignes droites (12 blocs) entrecoupées de petits crans latéraux courts (2 blocs) — mouvement doux, sans partir complètement à droite ou à gauche.
-  - `Cercle` : tourne à droite après chaque bras ; bras assez longs dès le départ, qui grandissent lentement (spirale progressive, pas de virages serrés).
-  - Dans tous les styles, la direction de minage est entièrement pilotée par le mod (figée dès l'activation, plus jamais liée au regard en direct) et la caméra suit automatiquement — en ligne droite elle reste fixe, en zigzag/cercle elle ne tourne jamais de plus de 30° par rapport à la direction de départ, pour rester dans le champ de vision (même quand le tunnel fait un cran à 90°).
+- Minage tout droit uniquement : la direction est figée dès l'activation (plus jamais liée au regard en direct) et la caméra reste fixe dessus tant que le minage tourne.
 - Le bot ne marche pas dans le vide **si `Verrouiller le niveau Y` est actif** : sans sol devant (trou, ravin), il saute par-dessus si le trou fait 1 bloc de large, sinon il s'arrête au lieu de tomber. Sans verrouillage, aucune couche à maintenir : il ignore les trous et se laisse tomber dedans en continuant tout droit — le bloc devant lui, s'il y en a un, est cassé normalement dans tous les cas.
 - Le bloc qui porte le joueur n'est jamais cassé, même s'il correspond à un minerai/bloc obligatoire détecté juste sous les pieds — évite de tomber dans le vide en minant son propre plancher.
 - **Touche "libérer la souris"** (`key.miningmod.ungrab`, par défaut `N`) : évite qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille.

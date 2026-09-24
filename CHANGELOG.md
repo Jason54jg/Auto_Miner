@@ -2,6 +2,9 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.34
+- Suppression des styles Zigzag et Cercle : le mod ne mine plus qu'en ligne droite (direction figée à l'activation, comme avant). Le champ `pattern` disparaît de la config, le bouton "Style" de l'écran `/miningbot` aussi.
+
 ## 0.0.33
 - Fix compile : `Player.displayClientMessage(Component, Boolean)` a disparu en 26.2, scindé en `sendSystemMessage(Component)` (chat) et `sendOverlayMessage(Component)` (action bar). Le message d'activation/désactivation utilise maintenant `sendSystemMessage`.
 
