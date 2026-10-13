@@ -1,0 +1,45 @@
+{
+	"schemaVersion": 1,
+	"id": "autominer",
+	"version": "${version}",
+	"name": "Auto Miner",
+	"description": "Mine et avance tout droit automatiquement en maintenant une touche, en cassant systématiquement les minerais rencontrés autour du tunnel.",
+	"authors": [
+		"Jason54jg"
+	],
+	"contact": {
+		"sources": "https://github.com/jason54jg/miningmod"
+	},
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			{
+				"adapter": "kotlin",
+				"value": "com.jason54jg.autominer.AutoMinerMod"
+			}
+		],
+		"client": [
+			{
+				"adapter": "kotlin",
+				"value": "com.jason54jg.autominer.client.AutoMinerModClient"
+			}
+		],
+		"modmenu": [
+			{
+				"adapter": "kotlin",
+				"value": "com.jason54jg.autominer.client.AutoMinerModMenuIntegration"
+			}
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*",
+		"fabric-language-kotlin": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}

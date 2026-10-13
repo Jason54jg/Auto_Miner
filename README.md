@@ -2,9 +2,9 @@
 
 *English | [Français](README.fr.md)*
 
-Fabric mod for Minecraft **26.2** that digs a straight tunnel automatically: a key toggles mining, the player advances while breaking the blocks in front of them, and systematically breaks any ore touching the tunnel.
+Fabric mod for Minecraft **26.1 – 26.3** that digs a straight tunnel automatically: a key toggles mining, the player advances while breaking the blocks in front of them, and systematically breaks any ore touching the tunnel.
 
-Current version: **0.0.42** (see [CHANGELOG.md](CHANGELOG.md))
+Current version: **0.0.43** (see [CHANGELOG.md](CHANGELOG.md))
 
 ## Features
 
@@ -41,26 +41,34 @@ Current version: **0.0.42** (see [CHANGELOG.md](CHANGELOG.md))
 
 ## Requirements
 
-- Minecraft **26.2**
+- Minecraft **26.1 – 26.3** (one jar per version, built with [Stonecutter](https://stonecutter.kikugie.dev/))
 - [Fabric Loader](https://fabricmc.net/) `>= 0.19.5`
-- [Fabric API](https://modrinth.com/mod/fabric-api) `0.161.0+26.2`
-- [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) `1.13.12+kotlin.2.4.0`
-- [Mod Menu](https://modrinth.com/mod/modmenu) `20.0.1` *(optional, for the config button in the mod list)*
+- [Fabric API](https://modrinth.com/mod/fabric-api) and [Mod Menu](https://modrinth.com/mod/modmenu) *(optional, for the config button in the mod list)* matching your Minecraft version:
+
+  | Minecraft | Fabric API | Mod Menu |
+  | --------- | ---------- | -------- |
+  | 26.1 – 26.1.2 | `0.155.3+26.1.2` | `18.0.2` |
+  | 26.2 | `0.161.0+26.2` | `20.0.1` |
+  | 26.3 | `0.162.0+26.3` | `21.0.0` |
+
+- [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin): `1.13.12+kotlin.2.4.0` (26.1/26.2) or `1.14.2+kotlin.2.4.21` (26.3)
 - Java **25**
 
 ## Build
 
 ```bash
-./gradlew build
+./gradlew :26.1.2:build   # Minecraft 26.1 – 26.1.2
+./gradlew :26.2:build     # Minecraft 26.2
+./gradlew :26.3:build     # Minecraft 26.3
 ```
 
-The generated `.jar` is in `build/libs/`.
+The generated `.jar` files (`autominer-<version>+<mc>.jar`) are in `versions/<mc>/build/libs/`.
 
 ## Installation
 
-1. Install Fabric Loader for Minecraft 26.2.
-2. Place in the `mods/` folder:
-   - `autominer-<version>.jar`
+1. Install Fabric Loader for your Minecraft version (26.1, 26.2 or 26.3).
+2. Place in the `mods/` folder the matching files:
+   - `autominer-<version>+<mc>.jar`
    - `fabric-api-<version>.jar`
    - `fabric-language-kotlin-<version>.jar`
 
@@ -70,8 +78,14 @@ The generated `.jar` is in `build/libs/`.
 src/
 ├── main/kotlin/...    # Shared data/logic (config, stats, mod initializer) — no client-only classes
 ├── client/kotlin/...  # AutoMiner, keybinds, HUD, screens (everything touching Minecraft/LocalPlayer/rendering)
-└── main/resources/    # fabric.mod.json, lang
+└── main/resources/    # lang files (shared)
+versions/
+├── 26.1.2/            # gradle.properties + fabric.mod.json (~26.1) for Minecraft 26.1 – 26.1.2
+├── 26.2/              # gradle.properties + fabric.mod.json (~26.2)
+└── 26.3/              # gradle.properties + fabric.mod.json (~26.3)
 ```
+
+Version-specific API differences (SDL key constants on 26.3, `setScreen` on 26.1) are handled with Stonecutter `//?` conditions directly in the shared sources.
 
 ## Versioning
 

@@ -154,7 +154,11 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
         AutoMinerModConfig.save(finalConfig)
         AutoMiner.applyConfig(finalConfig)
         MiningHud.applyConfig(finalConfig)
+        //? if <26.2 {
+        /*minecraft?.setScreen(parent)*/
+        //?} else {
         minecraft?.gui?.setScreen(parent)
+        //?}
     }
 
     private fun lockYLabel() = Component.translatable(if (config.lockYLevel) "screen.autominer.lock_y_yes" else "screen.autominer.lock_y_no")

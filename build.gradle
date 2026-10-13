@@ -27,6 +27,13 @@ loom {
 	}
 }
 
+// Script partagé Stonecutter : exécuté une fois par version Minecraft (voir versions/).
+// Le jar s'appelle autominer-<mod>+<mc>.jar (ex : autominer-0.0.43+26.2.jar).
+base {
+	archivesName = 'autominer'
+}
+version = "${project.version}+${sc.current.version}"
+
 sourceSets {
 	main {
 		kotlin.srcDirs += ['src/main/kotlin']
@@ -79,11 +86,8 @@ java {
 }
 
 jar {
-	def projectName = project.name
-	inputs.property "projectName", projectName
-
 	from("LICENSE") {
-		rename { "${it}_$projectName"}
+		rename { "${it}_${base.archivesName.get()}" }
 	}
 }
 

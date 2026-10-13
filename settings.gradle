@@ -9,4 +9,19 @@ pluginManagement {
 	}
 }
 
+plugins {
+	id 'dev.kikugie.stonecutter' version '0.9.8'
+}
+
+stonecutter {
+	// Le script partagé est en Groovy, pas en Kotlin.
+	kotlinController = false
+	centralScript = 'build.gradle'
+
+	create(getRootProject()) {
+		// Un sous-projet par version Minecraft supportée : voir versions/*/gradle.properties.
+		versions '26.1.2', '26.2', '26.3'
+	}
+}
+
 rootProject.name = 'autominer'

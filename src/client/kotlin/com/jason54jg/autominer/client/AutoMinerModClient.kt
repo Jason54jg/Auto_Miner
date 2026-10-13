@@ -6,14 +6,19 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.minecraft.ChatFormatting
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
+//? if >=26.3 {
+/*import com.mojang.blaze3d.platform.InputConstants*/
+//?} else {
 import org.lwjgl.glfw.GLFW
+//?}
 
 object AutoMinerModClient : ClientModInitializer {
     private var mouseUngrabbed = false
@@ -21,10 +26,18 @@ object AutoMinerModClient : ClientModInitializer {
     override fun onInitializeClient() {
         val category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("autominer", "main"))
         val toggleKey = KeyMappingHelper.registerKeyMapping(
+            //? if >=26.3 {
+            /*KeyMapping("key.autominer.toggle", InputConstants.KEY_B, category)*/
+            //?} else {
             KeyMapping("key.autominer.toggle", GLFW.GLFW_KEY_B, category)
+            //?}
         )
         val ungrabKey = KeyMappingHelper.registerKeyMapping(
+            //? if >=26.3 {
+            /*KeyMapping("key.autominer.ungrab", InputConstants.KEY_N, category)*/
+            //?} else {
             KeyMapping("key.autominer.ungrab", GLFW.GLFW_KEY_N, category)
+            //?}
         )
 
         ClientTickEvents.END_CLIENT_TICK.register { client ->
@@ -44,7 +57,11 @@ object AutoMinerModClient : ClientModInitializer {
                     // commande, dans le même appel : ouvrir l'écran ici serait aussitôt écrasé. On le
                     // reporte à la tâche suivante de la boucle client, une fois le chat déjà fermé.
                     Minecraft.getInstance().execute {
+                        //? if <26.2 {
+                        /*Minecraft.getInstance().setScreen(AutoMinerModConfigScreen(null))*/
+                        //?} else {
                         Minecraft.getInstance().gui.setScreen(AutoMinerModConfigScreen(null))
+                        //?}
                     }
                     1
                 }
@@ -53,6 +70,16 @@ object AutoMinerModClient : ClientModInitializer {
 
         ClientReceiveMessageEvents.CHAT.register { message, _, _, _, _ ->
             if (AutoMiner.active) AlertManager.checkMention(Minecraft.getInstance(), message)
+        }
+        // Les annonces serveur (qui contiennent aussi le pseudo) passent par GAME, pas CHAT.
+        ClientReceiveMessageEvents.GAME.register { message, _ ->
+            if (AutoMiner.active) AlertManager.checkMention(Minecraft.getInstance(), message)
+        }
+
+        // Un changement de monde/dimension déplace le joueur sans téléportation : repart d'une
+        // position saine au lieu de déclencher une fausse alerte au premier tick actif.
+        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
+            AlertManager.resetTeleportTracking()
         }
 
         HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("autominer", "mining_hud")) { graphics, _ ->

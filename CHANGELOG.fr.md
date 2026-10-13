@@ -4,6 +4,11 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.43
+- Support multi-versions via Stonecutter : un jar par Minecraft **26.1.x** (26.1, 26.1.1, 26.1.2), **26.2** et **26.3** (`autominer-<version>+<mc>.jar` — voir le README pour les versions Fabric API / Mod Menu correspondantes). Le code 26.1 garde les API d'avant la 26.2 (`KeyBinding`, `ClientCommandManager`, `GuiGraphics`, `displayClientMessage`...).
+- Fix : les alertes de mention n'écoutaient que le chat des joueurs (`CHAT`) — les annonces serveur (`GAME`), qui peuvent aussi contenir le pseudo, déclenchent l'alerte aussi.
+- Fix : rejoindre un autre monde/une autre dimension en plein minage ne déclenche plus de fausse alerte de téléportation (le suivi de position repart à zéro à la connexion).
+
 ## 0.0.42
 - Fix : le rappel à l'écran de la souris libérée affichait "N" en dur, ce qui devenait faux si le joueur réassigne `key.autominer.ungrab` dans les options. Affiche maintenant la touche réellement assignée (`KeyMapping.translatedKeyMessage`).
 
