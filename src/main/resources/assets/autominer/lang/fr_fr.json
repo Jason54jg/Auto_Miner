@@ -5,10 +5,10 @@
 
 	"screen.autominer.title": "Auto Miner",
 	"screen.autominer.subtitle": "Réglages pour ton serveur et ta pioche",
-	"screen.autominer.tab.general": "Gén.",
+	"screen.autominer.tab.general": "Général",
 	"screen.autominer.tab.tunnel": "Tunnel",
-	"screen.autominer.tab.obstacles": "Obs.",
-	"screen.autominer.tab.display": "HUD",
+	"screen.autominer.tab.obstacles": "Obstacles",
+	"screen.autominer.tab.display": "Affichage",
 	"screen.autominer.section.general": "Général",
 	"screen.autominer.section.tunnel": "Tunnel",
 	"screen.autominer.section.obstacles": "Obstacles",

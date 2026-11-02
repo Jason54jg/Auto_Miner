@@ -8,7 +8,7 @@
 
 Fabric mod for Minecraft **26.1 – 26.3** that digs a straight tunnel automatically: a key toggles mining, the player advances while breaking the blocks in front of them, and systematically breaks any ore touching the tunnel.
 
-Current version: **0.0.47** (see [CHANGELOG.md](CHANGELOG.md))
+Current version: **0.0.48** (see [CHANGELOG.md](CHANGELOG.md))
 
 ## Features
 

@@ -46,7 +46,7 @@ fun main(){
  }
  scenario("malformed JSON falls back to defaults") {
   Files.writeString(configPath,"{broken json")
-  expect(AutoMinerModConfig.load().blocksPerTick==1,"missing fallback")
+  expect(AutoMinerModConfig.load().blocksPerTick==0,"missing fallback")
  }
  scenario("JSON null falls back safely") {
   Files.writeString(configPath,"null")
@@ -262,7 +262,7 @@ fun main(){
  scenario("master configuration migration and normalization are retained") {
   Files.writeString(configPath,"""{"configVersion":1,"reach":3.5,"blocksPerTick":-2,"tunnelWidth":8}""")
   val loaded=AutoMinerModConfig.load()
-  expect(loaded.configVersion==2 && loaded.reach==3.5 && loaded.blocksPerTick==1 && loaded.tunnelWidth==2,"normalization or existing settings lost")
+  expect(loaded.configVersion==2 && loaded.reach==3.5 && loaded.blocksPerTick==0 && loaded.tunnelWidth==2,"normalization or existing settings lost")
   expect(loaded.obstacleNavigationMode==ObstacleNavigationMode.SMART && loaded.bypassObstacles,"migration defaults lost")
  }
  println("RESULT passed=$passed failed=$failed total=${passed+failed}")

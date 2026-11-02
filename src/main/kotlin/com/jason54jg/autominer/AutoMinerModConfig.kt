@@ -11,7 +11,7 @@ import java.nio.file.Files
 data class AutoMinerModConfig(
     var configVersion: Int = 2,
     var reach: Double = 4.5,
-    var blocksPerTick: Int = 1,
+    var blocksPerTick: Int = 0,
     var lockYLevel: Boolean = false,
     var targetY: Int = -59,
     /** Rayon latéral du tunnel : 0 = 1 colonne (par défaut), 1 = 3 colonnes, 2 = 5 colonnes. */
@@ -63,7 +63,7 @@ data class AutoMinerModConfig(
             return copy(
                 configVersion = 2,
                 reach = if (reach >= 1.0) reach else defaults.reach,
-                blocksPerTick = blocksPerTick.coerceAtLeast(1),
+                blocksPerTick = blocksPerTick.coerceAtLeast(0),
                 tunnelWidth = tunnelWidth.coerceIn(0, 2),
                 obstacleDetectionReach = obstacleDetectionReach.coerceIn(1, 6)
             )

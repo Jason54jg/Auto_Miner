@@ -4,6 +4,12 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.48
+- **Mise en page de l’écran de config** : espacement dynamique pour les libellés outil/bloc obligatoire (plus de chevauchement quand le texte revient à la ligne) ; sous-titre contenu dans le panneau principal avec retour à la ligne, sans déborder sur la barre latérale.
+- **Onglets** : barre latérale un peu plus large, libellés lisibles (l’onglet actif n’utilise plus le style « désactivé » de Minecraft) ; libellé tunnel raccourci en « Tun. » si besoin.
+- **Boutons plats modernes** sur l’écran de config (onglets, bascules, Enregistrer/Annuler, slots d’items) à la place des textures pierre vanilla — styles primary/secondary/onglet/slot avec survol et sélection.
+- **Blocs/tick** : valeur par défaut **0** (plancher à la sauvegarde/normalisation) ; **0** correspond toujours à une action de minage par tick (rythme vanilla), les valeurs plus hautes activent la casse multiple par tick.
+
 ## 0.0.47
 - Nouvelle identité visuelle : logo pioche cyan/cuivre et bannière, icône déclarée dans les trois JAR et logo affiché dans la configuration. Le panneau est dessiné avant ses widgets pour ne pas les recouvrir.
 - Site d’information bilingue, responsive et sans dépendances de build, publié par un workflow GitHub Pages depuis master. Les versions et dépendances sont lues depuis Gradle.

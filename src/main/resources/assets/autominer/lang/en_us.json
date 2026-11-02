@@ -5,10 +5,10 @@
 
 	"screen.autominer.title": "Auto Miner",
 	"screen.autominer.subtitle": "Settings for your server and pickaxe",
-	"screen.autominer.tab.general": "Gen.",
+	"screen.autominer.tab.general": "General",
 	"screen.autominer.tab.tunnel": "Tunnel",
-	"screen.autominer.tab.obstacles": "Obs.",
-	"screen.autominer.tab.display": "HUD",
+	"screen.autominer.tab.obstacles": "Obstacles",
+	"screen.autominer.tab.display": "Display",
 	"screen.autominer.section.general": "General",
 	"screen.autominer.section.tunnel": "Tunnel",
 	"screen.autominer.section.obstacles": "Obstacles",

@@ -120,7 +120,8 @@ object AutoMiner {
             }
         }
 
-        repeat(config.blocksPerTick.coerceAtLeast(1)) {
+        val blocksThisTick = config.blocksPerTick.takeIf { it > 0 } ?: 1
+        repeat(blocksThisTick) {
             if (!mineOrAdvance(player, level, gameMode)) {
                 reactIfStuck(client)
                 return

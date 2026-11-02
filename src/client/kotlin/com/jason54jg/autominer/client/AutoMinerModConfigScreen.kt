@@ -39,6 +39,12 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
     private var sidebarRight = 0
     private var slotColumnLeft = 0
 
+    private val sidebarWidth = 82
+    private val tabButtonHeight = 22
+    private val tabButtonPad = 6
+    private val headerSubtitleY = 18
+    private val headerGapBelowSubtitle = 14
+
     override fun init() {
         super.init()
         layoutPanel()
@@ -47,17 +53,32 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
 
     private fun layoutPanel() {
         val panelW = 360
-        val panelH = 240
+        val panelH = 268
         panelLeft = width / 2 - panelW / 2
         panelTop = height / 2 - panelH / 2
         panelRight = panelLeft + panelW
         panelBottom = panelTop + panelH
-        sidebarRight = panelLeft + 52
+        sidebarRight = panelLeft + sidebarWidth
         contentLeft = sidebarRight + 8
-        contentTop = panelTop + 28
         contentRight = panelRight - 88
         slotColumnLeft = panelRight - 80
+        contentTop = computeContentTop()
     }
+
+    private fun headerTextMaxWidth(): Int =
+        (slotColumnLeft - contentLeft - 4).coerceAtLeast(40)
+
+    private fun subtitleLineCount(): Int = hintLineCount(
+        Component.translatable("screen.autominer.subtitle").string,
+        headerTextMaxWidth(),
+    )
+
+    /** Bottom edge (Y) of the wrapped subtitle in the header band. */
+    private fun headerSubtitleBottomY(): Int =
+        panelTop + headerSubtitleY + subtitleLineCount() * 9
+
+    private fun computeContentTop(): Int =
+        headerSubtitleBottomY() + headerGapBelowSubtitle
 
     private fun rebuildTabWidgets() {
         clearWidgets()
@@ -74,21 +95,19 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
         buildFooter()
     }
 
+    private fun tabButtonWidth(): Int = sidebarWidth - tabButtonPad * 2
+
     private fun addTabButtons() {
-        val tabs = Tab.entries
-        val tabH = 22
-        var y = panelTop + 30
-        for (entry in tabs) {
-            val selected = entry == tab
+        val tabW = tabButtonWidth()
+        var y = (headerSubtitleBottomY() + 6).coerceAtLeast(panelTop + 30)
+        for (entry in Tab.entries) {
             addRenderableWidget(
-                Button.builder(tabLabel(entry)) {
+                ModernFlatButton.builder(tabLabel(entry), ModernButtonStyle.TAB, selected = { tab == entry }) {
                     tab = entry
                     rebuildTabWidgets()
-                }.bounds(panelLeft + 6, y, 40, tabH).build().also {
-                    it.active = !selected
-                }
+                }.bounds(panelLeft + tabButtonPad, y, tabW, tabButtonHeight).build()
             )
-            y += tabH + 4
+            y += tabButtonHeight + 4
         }
     }
 
@@ -105,23 +124,30 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
         y += 24
         addRenderableWidget(
             numberField(contentLeft + 120, y, config.blocksPerTick.toString()) { text ->
-                text.toIntOrNull()?.let { config = config.copy(blocksPerTick = it.coerceAtLeast(1)) }
+                text.toIntOrNull()?.let { config = config.copy(blocksPerTick = it.coerceAtLeast(0)) }
             }
         )
         registerLabel("screen.autominer.blocks_per_tick", contentLeft, y)
     }
 
+    private fun contentButtonWidth(): Int = contentRight - contentLeft
+
+    private fun secondaryButtonHeight(message: Component): Int =
+        ModernFlatButton.secondaryHeight(font, message, contentButtonWidth())
+
     private fun buildTunnelTab() {
         var y = contentTop
         addLabelRow("screen.autominer.section.tunnel", y)
         y += 16
+        val lockLabel = lockYLabel()
+        val lockBtnH = secondaryButtonHeight(lockLabel)
         addRenderableWidget(
-            Button.builder(lockYLabel()) {
+            ModernFlatButton.builder(lockLabel, ModernButtonStyle.SECONDARY) {
                 config = config.copy(lockYLevel = !config.lockYLevel)
                 it.message = lockYLabel()
-            }.bounds(contentLeft, y, contentRight - contentLeft, 20).build()
+            }.bounds(contentLeft, y, contentButtonWidth(), lockBtnH).build()
         )
-        y += 24
+        y += lockBtnH + 4
         addRenderableWidget(
             numberField(contentLeft + 120, y, config.targetY.toString()) { text ->
                 text.toIntOrNull()?.let { config = config.copy(targetY = it) }
@@ -140,9 +166,11 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
     private fun buildObstaclesTab() {
         var y = contentTop
         addLabelRow("screen.autominer.section.obstacles", y)
-        y += 14
+        y += 16
+        val modeLabel = obstacleModeLabel()
+        val modeBtnH = secondaryButtonHeight(modeLabel)
         addRenderableWidget(
-            Button.builder(obstacleModeLabel()) {
+            ModernFlatButton.builder(modeLabel, ModernButtonStyle.SECONDARY) {
                 config = config.copy(
                     obstacleNavigationMode = when (config.obstacleNavigationMode) {
                         ObstacleNavigationMode.FORWARD_ONLY -> ObstacleNavigationMode.SMART
@@ -150,30 +178,26 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
                     }
                 )
                 rebuildTabWidgets()
-            }.bounds(contentLeft, y, contentRight - contentLeft, 20).build()
+            }.bounds(contentLeft, y, contentButtonWidth(), modeBtnH).build()
         )
-        y += 24
+        y += modeBtnH + 4
         val smartNav = config.obstacleNavigationMode == ObstacleNavigationMode.SMART
-        addRenderableWidget(
-            toggleButton(contentLeft, y) {
-                config = config.copy(bypassObstacles = !config.bypassObstacles)
-                it.message = toggleLabel("screen.autominer.bypass_obstacles", config.bypassObstacles)
-            }.also {
-                it.message = toggleLabel("screen.autominer.bypass_obstacles", config.bypassObstacles)
-                it.active = smartNav
-            }
-        )
-        y += 24
-        addRenderableWidget(
-            toggleButton(contentLeft, y) {
-                config = config.copy(descendUnderOverhangs = !config.descendUnderOverhangs)
-                it.message = toggleLabel("screen.autominer.descend_under", config.descendUnderOverhangs)
-            }.also {
-                it.message = toggleLabel("screen.autominer.descend_under", config.descendUnderOverhangs)
-                it.active = smartNav
-            }
-        )
-        y += 24
+        y = addToggleButton(
+            y,
+            toggleLabel("screen.autominer.bypass_obstacles", config.bypassObstacles),
+            smartNav,
+        ) {
+            config = config.copy(bypassObstacles = !config.bypassObstacles)
+            it.message = toggleLabel("screen.autominer.bypass_obstacles", config.bypassObstacles)
+        }
+        y = addToggleButton(
+            y,
+            toggleLabel("screen.autominer.descend_under", config.descendUnderOverhangs),
+            smartNav,
+        ) {
+            config = config.copy(descendUnderOverhangs = !config.descendUnderOverhangs)
+            it.message = toggleLabel("screen.autominer.descend_under", config.descendUnderOverhangs)
+        }
         addRenderableWidget(
             numberField(contentLeft + 120, y, config.obstacleDetectionReach.toString()) { text ->
                 text.toIntOrNull()?.let { config = config.copy(obstacleDetectionReach = it.coerceIn(1, 6)) }
@@ -202,21 +226,45 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
         registerLabel("screen.autominer.hud_y", contentLeft, y)
     }
 
+    private data class SlotColumnLayout(
+        val toolLabelY: Int,
+        val toolSlotY: Int,
+        val toolHintY: Int,
+        val mandatoryLabelY: Int,
+        val oreSlotY: Int,
+        val oreHintY: Int,
+    )
+
+    private fun slotColumnLayout(): SlotColumnLayout {
+        val slotLabelW = 72
+        val toolLabelY = contentTop
+        val toolSlotY = toolLabelY + 14
+        val toolHintY = toolSlotY + 22
+        val toolHintLines = hintLineCount(toolShortLabel(ToolSelection.item), slotLabelW)
+        val mandatoryLabelY = toolHintY + toolHintLines * 9 + 6
+        val oreSlotY = mandatoryLabelY + 14
+        val oreHintY = oreSlotY + 22
+        return SlotColumnLayout(toolLabelY, toolSlotY, toolHintY, mandatoryLabelY, oreSlotY, oreHintY)
+    }
+
+    private fun hintLineCount(text: String, maxWidth: Int): Int =
+        font.split(Component.literal(text), maxWidth).size.coerceAtLeast(1)
+
     private fun buildSlotColumn() {
-        var y = panelTop + 28
+        val layout = slotColumnLayout()
         toolSlotX = slotColumnLeft
-        toolSlotY = y + 14
+        toolSlotY = layout.toolSlotY
         addRenderableWidget(
-            Button.builder(Component.empty()) {
+            ModernFlatButton.builder(Component.empty(), ModernButtonStyle.SLOT) {
                 val held = minecraft?.player?.mainHandItem
                 ToolSelection.item = held?.takeUnless { it.isEmpty }?.item
+                rebuildTabWidgets()
             }.bounds(toolSlotX, toolSlotY, 20, 20).build()
         )
-        y += 44
         oreSlotX = slotColumnLeft
-        oreSlotY = y + 14
+        oreSlotY = layout.oreSlotY
         addRenderableWidget(
-            Button.builder(Component.empty()) {
+            ModernFlatButton.builder(Component.empty(), ModernButtonStyle.SLOT) {
                 val hit = minecraft?.hitResult as? BlockHitResult ?: return@builder
                 val level = minecraft?.level ?: return@builder
                 val block = level.getBlockState(hit.blockPos).block
@@ -231,11 +279,11 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
         val saveX = panelRight - btnW * 2 - gap - 8
         val cancelY = panelBottom - 28
         addRenderableWidget(
-            Button.builder(Component.translatable("screen.autominer.cancel")) { onCancel() }
+            ModernFlatButton.builder(Component.translatable("screen.autominer.cancel"), ModernButtonStyle.SECONDARY) { onCancel() }
                 .bounds(saveX, cancelY, btnW, 20).build()
         )
         addRenderableWidget(
-            Button.builder(Component.translatable("screen.autominer.save")) { onSave() }
+            ModernFlatButton.builder(Component.translatable("screen.autominer.save"), ModernButtonStyle.PRIMARY) { onSave() }
                 .bounds(saveX + btnW + gap, cancelY, btnW, 20).build()
         )
     }
@@ -264,10 +312,20 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
         return box
     }
 
-    private fun toggleButton(x: Int, y: Int, onClick: (Button) -> Unit): Button {
-        return Button.builder(Component.empty()) { onClick(it) }
-            .bounds(x, y, contentRight - x, 20)
-            .build()
+    private fun addToggleButton(
+        y: Int,
+        message: Component,
+        enabled: Boolean,
+        onClick: (Button) -> Unit,
+    ): Int {
+        val btnH = secondaryButtonHeight(message)
+        addRenderableWidget(
+            ModernFlatButton.builder(message, ModernButtonStyle.SECONDARY) { onClick(it) }
+                .bounds(contentLeft, y, contentButtonWidth(), btnH)
+                .build()
+                .also { it.active = enabled }
+        )
+        return y + btnH + 4
     }
 
     private fun toggleLabel(baseKey: String, on: Boolean): Component {
@@ -281,10 +339,17 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
         val white = 0xFFFFFFFF.toInt()
         val muted = 0xFFAAAAAA.toInt()
         graphics.blit(logo, panelLeft + 8, panelTop + 4, panelLeft + 32, panelTop + 28, 0f, 1f, 0f, 1f)
-        graphics.text(font, title.string, panelLeft + 38, panelTop + 8, white, true)
-        graphics.text(font, Component.translatable("screen.autominer.subtitle").string, panelLeft + 38, panelTop + 18, muted, false)
+        graphics.text(font, title.string, contentLeft, panelTop + 8, white, true)
+        wrapHint(
+            graphics,
+            Component.translatable("screen.autominer.subtitle").string,
+            contentLeft,
+            panelTop + headerSubtitleY,
+            headerTextMaxWidth(),
+            muted
+        )
         for (row in rowLabels) {
-            graphics.text(font, Component.translatable(row.key).string, row.x, row.y + 6, white, true)
+            graphics.text(font, Component.translatable(row.key).string, row.x, row.y + 8, white, true)
         }
         if (tab == Tab.OBSTACLES && obstacleHintY > 0) {
             wrapHint(graphics, Component.translatable("screen.autominer.obstacle_hint").string, contentLeft, obstacleHintY, contentRight - contentLeft, 0xFF88AAFF.toInt())
@@ -301,19 +366,21 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
     }
 
     private fun renderSlotColumn(graphics: GuiGraphicsExtractor, white: Int, muted: Int) {
-        graphics.text(font, Component.translatable("screen.autominer.tool_slot").string, slotColumnLeft, panelTop + 28, muted, false)
+        val slotLabelW = 72
+        val layout = slotColumnLayout()
+        graphics.text(font, Component.translatable("screen.autominer.tool_slot").string, slotColumnLeft, layout.toolLabelY, muted, false)
         val tool = ToolSelection.item
         if (tool != null) {
             graphics.item(ItemStack(tool), toolSlotX + 2, toolSlotY + 2)
         }
-        wrapHint(graphics, toolShortLabel(tool), slotColumnLeft, toolSlotY + 22, 72, white)
+        wrapHint(graphics, toolShortLabel(tool), slotColumnLeft, layout.toolHintY, slotLabelW, white)
 
-        graphics.text(font, Component.translatable("screen.autominer.mandatory_slot").string, slotColumnLeft, panelTop + 72, muted, false)
+        graphics.text(font, Component.translatable("screen.autominer.mandatory_slot").string, slotColumnLeft, layout.mandatoryLabelY, muted, false)
         val ore = CustomOreSelection.block
         if (ore != null) {
             graphics.item(ItemStack(ore), oreSlotX + 2, oreSlotY + 2)
         }
-        wrapHint(graphics, blockShortLabel(ore), slotColumnLeft, oreSlotY + 22, 72, white)
+        wrapHint(graphics, blockShortLabel(ore), slotColumnLeft, layout.oreHintY, slotLabelW, white)
     }
 
     private fun wrapHint(graphics: GuiGraphicsExtractor, text: String, x: Int, y: Int, maxWidth: Int, color: Int) {

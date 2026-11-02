@@ -4,6 +4,12 @@
 
 Each new request bumps the version by `0.0.1`.
 
+## 0.0.48
+- **Config screen layout**: dynamic spacing for the tool/mandatory-block labels so wrapped text no longer overlaps; subtitle stays in the main panel with word wrap instead of crossing the sidebar divider.
+- **Tab buttons**: wider sidebar, readable labels (selected tab no longer uses the disabled Minecraft style); tab label shortened to `Tun.` where needed.
+- **Modern flat buttons** on the config screen (tabs, toggles, Save/Cancel, item slots) instead of vanilla stone textures — primary/secondary/tab/slot styles with hover and selection states.
+- **Blocks/tick** default is now `0` (saved/normalized floor); `0` still means one mining action per tick (vanilla pace), higher values enable multi-break per tick.
+
 ## 0.0.47
 - New visual identity: cyan/copper pickaxe logo and banner, icon metadata in all three JARs and a logo in the configuration screen. Draw the panel before its widgets so it does not cover them.
 - Bilingual responsive information site with no build dependencies, deployed from master through GitHub Pages Actions. Versions and dependencies come from Gradle.
