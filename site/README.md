@@ -41,6 +41,8 @@ Ne pas utiliser **Deploy from a branch → master / (root)** : cela publie les
 fichiers du dépôt et peut écraser le site généré par le workflow. La source doit
 être **GitHub Actions**. Le workflow lit l'URL réelle de Pages, génère `_site`,
 puis vérifie les deux langues, les ressources et la version réellement servie.
+Le job de déploiement sélectionne ce mode avec son autorisation `pages: write`,
+en conservant les règles de protection de l'environnement `github-pages`.
 
 ```bash
 python3 scripts/check_deployed_site.py https://jason54jg.github.io/Auto_Miner/
