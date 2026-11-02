@@ -4,7 +4,7 @@
 
 Mod Fabric pour Minecraft **26.1 – 26.3** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.44** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
+Version actuelle : **0.0.45** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
 
 ## Fonctionnalités
 
@@ -22,9 +22,11 @@ Version actuelle : **0.0.44** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
   - `Blocs/tick` : nombre de blocs pouvant être cassés en un seul tick (utile avec haste/efficacité ou une capacité de casse instantanée multiple) ;
   - `Verrouiller le niveau Y` + `Couche Y` : le tunnel reste à la hauteur choisie plutôt qu'à celle où le minage a été activé. Le mod descend automatiquement (casse le bloc sous les pieds, attend d'atterrir, recommence) jusqu'à cette couche avant de creuser à l'horizontale — pas un vrai pathfinding, juste une descente verticale, qui s'arrête net sur un bloc incassable ou un liquide.
   - `Largeur du tunnel` : élargit la zone minée latéralement (utile avec un outil qui a son propre effet de zone, ou juste pour creuser plus large).
-  - **Slot "Bloc obligatoire"** : vise le bloc voulu dans le monde, puis ouvre `/autominer` et clique sur le slot — désigne ce bloc custom comme à casser impérativement dès qu'il est détecté à portée, où qu'il soit autour du joueur (contrairement aux minerais vanilla, limités à ce qui touche le tunnel). Utile sur un serveur moddé avec ses propres blocs de ressource. Choix en mémoire seulement (comme le slot outil).
+  - **Slot "Bloc obligatoire"** : vise le bloc voulu dans le monde, puis ouvre `/autominer` et clique sur le slot — désigne ce bloc custom comme à casser impérativement dès qu'il est détecté à portée, où qu'il soit autour du joueur (contrairement aux minerais vanilla, limités à ce qui touche le tunnel). Utile sur un serveur moddé avec ses propres blocs de ressource.
+  - Onglet **Obstacles** (navigation intelligente) : contourner, descendre d'une marche, portée de détection — utile avec une pioche AOE qui vide une grande zone et laisse le bot bloqué.
   - `Position HUD X`/`Position HUD Y` : déplace le panneau du HUD de minage (coin haut-gauche par défaut) où tu veux à l'écran, en pixels.
-  - Réglages sauvegardés dans `config/autominer.json` (sauf le slot outil et le bloc obligatoire, volontairement non persistés).
+  - Écran par onglets avec **Enregistrer** / **Annuler** (Échap = annuler sans sauver).
+  - Réglages sauvegardés dans `config/autominer.json`, y compris l'outil et le bloc obligatoire choisis (`toolItemId` / `customBlockId`).
 - **Alertes téléportation/mention** (actives uniquement pendant que le minage tourne) : un son (ding) et un flash rouge de l'écran pendant 3 secondes se déclenchent si :
   - le joueur se déplace de façon anormale en un seul tick (téléportation, TP admin, etc.) ;
   - le pseudo du joueur apparaît dans un message de chat reçu (mention).
@@ -32,7 +34,7 @@ Version actuelle : **0.0.44** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
 - Le bot ne marche pas dans le vide **si `Verrouiller le niveau Y` est actif** (et que le joueur ne vole pas) : sans sol devant (trou, ravin), il saute par-dessus si le trou fait 1 bloc de large, sinon il s'arrête au lieu de tomber. Sans verrouillage, ou en vol créatif/spectateur, aucune hauteur à maintenir : il ignore les trous et avance tout droit sans se soucier du sol — le bloc devant lui, s'il y en a un, est cassé normalement dans tous les cas.
 - Le bloc qui porte le joueur n'est jamais cassé, même s'il correspond à un minerai/bloc obligatoire détecté juste sous les pieds — évite de tomber dans le vide en minant son propre plancher.
 - **Touche "libérer la souris"** (`key.autominer.ungrab`, par défaut `N`) : évite qu'un mouvement de souris involontaire ne fasse tourner la caméra (et donc la direction de minage) pendant que le bot travaille. Un message dans le chat confirme à chaque fois, et un rappel reste affiché à l'écran tant que la souris est libérée.
-- **Slot outil** (écran de config) : case cliquable qui capture l'objet actuellement en main du joueur comme outil de minage ; le mod l'équipe automatiquement depuis la hotbar avant de miner. Choix en mémoire seulement (non sauvegardé entre deux lancements du jeu).
+- **Slot outil** (écran de config) : case cliquable qui capture l'objet actuellement en main du joueur comme outil de minage ; le mod l'équipe automatiquement depuis la hotbar avant de miner. Sauvegardé dans la config au clic sur **Enregistrer**.
 - **HUD de minage** (coin haut-gauche, visible pendant que le minage est actif) :
   - temps écoulé depuis l'activation ;
   - nombre total de blocs cassés ;

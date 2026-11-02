@@ -195,7 +195,7 @@ object AutoMiner {
 
         if (current == null) {
             target = null
-            val moved = advance(player, level, immediate, immediateFeet, facing, origin)
+            val moved = advance(player, level, immediate, immediateFeet, facing)
             stuckTicks = if (moved) 0 else stuckTicks + 1
             return false
         }
@@ -294,11 +294,10 @@ object AutoMiner {
         level: Level,
         immediate: List<BlockPos>,
         feet: List<BlockPos>,
-        facing: Direction,
-        origin: BlockPos
+        facing: Direction
     ): Boolean {
         if (immediate.any { !level.getBlockState(it).isAir }) {
-            return tryBypass(player, level, facing, origin)
+            return tryBypass(player, level, facing)
         }
 
         var verticalMotion = player.deltaMovement.y
@@ -314,7 +313,7 @@ object AutoMiner {
             // (pas de sol non plus deux blocs après) reste bloquant : on attend/mine plutôt que de tomber.
             val landing = feet.map { it.relative(facing, 1) }
             if (landing.any { level.getBlockState(it.below()).isAir }) {
-                return tryBypass(player, level, facing, origin)
+                return tryBypass(player, level, facing)
             }
             if (player.onGround()) verticalMotion = JUMP_VELOCITY
         }
@@ -336,11 +335,12 @@ object AutoMiner {
     }
 
     /** Décalage latéral si le tunnel est bloqué depuis quelques ticks (pioche AOE, mur résiduel). */
-    private fun tryBypass(player: LocalPlayer, level: Level, facing: Direction, origin: BlockPos): Boolean {
+    private fun tryBypass(player: LocalPlayer, level: Level, facing: Direction): Boolean {
         if (!smartNavigation() || !config.bypassObstacles || stuckTicks < 4) return false
         val side = if (sidestepDirection >= 0) facing.clockWise else facing.counterClockWise
         val sidePos = player.blockPosition().relative(side)
-        if (!isWalkableColumn(level, sidePos, origin.y)) {
+        val floorY = if (config.lockYLevel) config.targetY else player.blockPosition().y
+        if (!isWalkableColumn(level, sidePos, floorY)) {
             sidestepDirection = -sidestepDirection
             return false
         }

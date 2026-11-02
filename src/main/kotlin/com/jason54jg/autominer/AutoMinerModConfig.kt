@@ -41,7 +41,9 @@ data class AutoMinerModConfig(
             val loaded = runCatching {
                 Files.newBufferedReader(PATH).use { GSON.fromJson(it, AutoMinerModConfig::class.java) }
             }.getOrElse { AutoMinerModConfig() }
-            return loaded.migrateIfNeeded().also { if (it.configVersion != loaded.configVersion) save(it) }
+            val resolved = loaded.migrateIfNeeded().normalized()
+            if (resolved != loaded) save(resolved)
+            return resolved
         }
 
         private fun AutoMinerModConfig.migrateIfNeeded(): AutoMinerModConfig {
@@ -56,9 +58,20 @@ data class AutoMinerModConfig(
             )
         }
 
+        private fun AutoMinerModConfig.normalized(): AutoMinerModConfig {
+            val defaults = AutoMinerModConfig()
+            return copy(
+                configVersion = 2,
+                reach = if (reach >= 1.0) reach else defaults.reach,
+                blocksPerTick = blocksPerTick.coerceAtLeast(1),
+                tunnelWidth = tunnelWidth.coerceIn(0, 2),
+                obstacleDetectionReach = obstacleDetectionReach.coerceIn(1, 6)
+            )
+        }
+
         fun save(config: AutoMinerModConfig) {
             Files.createDirectories(PATH.parent)
-            Files.newBufferedWriter(PATH).use { GSON.toJson(config, it) }
+            Files.newBufferedWriter(PATH).use { GSON.toJson(config.normalized(), it) }
         }
     }
 }

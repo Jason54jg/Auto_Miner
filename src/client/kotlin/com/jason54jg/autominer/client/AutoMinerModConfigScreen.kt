@@ -147,22 +147,29 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
                         ObstacleNavigationMode.SMART -> ObstacleNavigationMode.FORWARD_ONLY
                     }
                 )
-                it.message = obstacleModeLabel()
+                rebuildTabWidgets()
             }.bounds(contentLeft, y, contentRight - contentLeft, 20).build()
         )
         y += 24
+        val smartNav = config.obstacleNavigationMode == ObstacleNavigationMode.SMART
         addRenderableWidget(
             toggleButton(contentLeft, y) {
                 config = config.copy(bypassObstacles = !config.bypassObstacles)
                 it.message = toggleLabel("screen.autominer.bypass_obstacles", config.bypassObstacles)
-            }.also { it.message = toggleLabel("screen.autominer.bypass_obstacles", config.bypassObstacles) }
+            }.also {
+                it.message = toggleLabel("screen.autominer.bypass_obstacles", config.bypassObstacles)
+                it.active = smartNav
+            }
         )
         y += 24
         addRenderableWidget(
             toggleButton(contentLeft, y) {
                 config = config.copy(descendUnderOverhangs = !config.descendUnderOverhangs)
                 it.message = toggleLabel("screen.autominer.descend_under", config.descendUnderOverhangs)
-            }.also { it.message = toggleLabel("screen.autominer.descend_under", config.descendUnderOverhangs) }
+            }.also {
+                it.message = toggleLabel("screen.autominer.descend_under", config.descendUnderOverhangs)
+                it.active = smartNav
+            }
         )
         y += 24
         addRenderableWidget(
@@ -321,12 +328,15 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
 
     private fun onSave() {
         val finalConfig = config.copy(
+            configVersion = 2,
             toolItemId = ToolSelection.item?.let(ToolSelection::idOf),
             customBlockId = CustomOreSelection.block?.let(CustomOreSelection::idOf)
         )
         AutoMinerModConfig.save(finalConfig)
         AutoMiner.applyConfig(finalConfig)
         MiningHud.applyConfig(finalConfig)
+        ToolSelection.applyFromConfig(finalConfig)
+        CustomOreSelection.applyFromConfig(finalConfig)
         closeScreen()
     }
 

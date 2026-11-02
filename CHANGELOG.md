@@ -4,6 +4,9 @@
 
 Each new request bumps the version by `0.0.1`.
 
+## 0.0.45
+- Audit / consistency: single client config bootstrap (AutoMiner, HUD, tool/block slots), value normalization on load/save, sidestep floor height with Y lock, Obstacles toggles disabled in forward-only mode, README aligned with actual persistence.
+
 ## 0.0.44
 - **Redesigned config screen**: tabbed panel (General, Tunnel, Obstacles, Display), tool/mandatory-block column, Save / Cancel buttons.
 - **Smart navigation** (Obstacles tab, enabled by default on migrated configs): breaks nearby ceilings/walls, steps down one block under overhangs, sidesteps when an AOE pick leaves the tunnel blocked. "Forward only" mode restores legacy behavior.

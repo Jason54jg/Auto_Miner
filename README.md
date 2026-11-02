@@ -4,7 +4,7 @@
 
 Fabric mod for Minecraft **26.1 – 26.3** that digs a straight tunnel automatically: a key toggles mining, the player advances while breaking the blocks in front of them, and systematically breaks any ore touching the tunnel.
 
-Current version: **0.0.44** (see [CHANGELOG.md](CHANGELOG.md))
+Current version: **0.0.45** (see [CHANGELOG.md](CHANGELOG.md))
 
 ## Features
 
@@ -22,9 +22,11 @@ Current version: **0.0.44** (see [CHANGELOG.md](CHANGELOG.md))
   - `Blocks/tick`: number of blocks that can be broken in a single tick (useful with haste/efficiency or a multi-instant-break ability) ;
   - `Lock Y level` + `Y level`: the tunnel stays at the chosen height instead of the one where mining was activated. The mod automatically descends (breaks the block underfoot, waits to land, repeats) to that layer before digging horizontally — not real pathfinding, just a controlled vertical descent, which stops dead on an unbreakable block or a liquid.
   - `Tunnel width`: widens the mined area sideways (useful with a tool that has its own area effect, or just to dig wider).
-  - **"Mandatory block" slot**: aim at the block you want in the world, then open `/autominer` and click the slot — designates that custom block as mandatory to break as soon as it's detected in range, wherever it is around the player (unlike vanilla ores, limited to what touches the tunnel). Useful on a modded server with its own resource blocks. In-memory choice only (like the tool slot).
+  - **"Mandatory block" slot**: aim at the block you want in the world, then open `/autominer` and click the slot — designates that custom block as mandatory to break as soon as it's detected in range, wherever it is around the player (unlike vanilla ores, limited to what touches the tunnel). Useful on a modded server with its own resource blocks.
+  - **Obstacles** tab (smart navigation): bypass, step down one block, detection reach — useful when an AOE pickaxe clears a large area and leaves the bot stuck.
   - `HUD position X`/`HUD position Y`: moves the mining HUD panel (top-left by default) wherever you want on screen, in pixels.
-  - Settings saved to `config/autominer.json` (except the tool slot and mandatory block, deliberately not persisted).
+  - Tabbed screen with **Save** / **Cancel** (Escape = cancel without saving).
+  - Settings saved to `config/autominer.json`, including the chosen tool and mandatory block (`toolItemId` / `customBlockId`).
 - **Teleport/mention alerts** (active only while mining is running): a sound (ding) and a red screen flash for 3 seconds trigger if:
   - the player moves abnormally in a single tick (teleport, admin TP, etc.) ;
   - the player's name appears in a received chat message (mention).
@@ -32,7 +34,7 @@ Current version: **0.0.44** (see [CHANGELOG.md](CHANGELOG.md))
 - The bot doesn't walk into thin air **if `Lock Y level` is active** (and the player isn't flying): with no floor ahead (hole, ravine), it jumps over a 1-block-wide hole, otherwise it stops instead of falling. Without the lock, or while flying in creative/spectator, there's no height to maintain: it ignores holes and keeps going straight ahead regardless of the floor — the block in front of it, if any, is still broken normally either way.
 - The block holding the player up is never broken, even if it matches an ore/mandatory block detected right underfoot — avoids falling into the void by mining its own floor.
 - **"Release mouse" key** (`key.autominer.ungrab`, `N` by default): prevents an unintentional mouse movement from turning the camera (and therefore the mining direction) while the bot is working. A chat message confirms it every time, and a reminder stays on screen for as long as the mouse remains released.
-- **Tool slot** (config screen): clickable slot that captures the item currently held by the player as the mining tool; the mod automatically equips it from the hotbar before mining. In-memory choice only (not saved between game launches).
+- **Tool slot** (config screen): clickable slot that captures the item currently held by the player as the mining tool; the mod automatically equips it from the hotbar before mining. Saved to config when you click **Save**.
 - **Mining HUD** (top-left corner, visible while mining is active):
   - time elapsed since activation ;
   - total number of blocks broken ;

@@ -10,7 +10,11 @@ import net.minecraft.world.item.Items
  * dans la hotbar). Persisté via [AutoMinerModConfig.toolItemId] (résolu au chargement).
  */
 object ToolSelection {
-    var item: Item? = AutoMinerModConfig.load().toolItemId?.let(::resolve)
+    var item: Item? = null
+
+    fun applyFromConfig(config: AutoMinerModConfig) {
+        item = config.toolItemId?.let(::resolve)
+    }
 
     fun idOf(item: Item): String = BuiltInRegistries.ITEM.getKey(item).toString()
 

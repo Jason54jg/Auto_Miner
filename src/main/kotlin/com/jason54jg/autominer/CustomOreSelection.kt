@@ -11,7 +11,11 @@ import net.minecraft.world.level.block.Blocks
  * Persisté via [AutoMinerModConfig.customBlockId] (résolu au chargement).
  */
 object CustomOreSelection {
-    var block: Block? = AutoMinerModConfig.load().customBlockId?.let(::resolve)
+    var block: Block? = null
+
+    fun applyFromConfig(config: AutoMinerModConfig) {
+        block = config.customBlockId?.let(::resolve)
+    }
 
     fun idOf(block: Block): String = BuiltInRegistries.BLOCK.getKey(block).toString()
 

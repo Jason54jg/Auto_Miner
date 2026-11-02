@@ -15,8 +15,8 @@ object MiningHud {
     private val TEXT_COLOR = 0xFFFFFFFF.toInt()
     private val TITLE_COLOR = 0xFF55FF55.toInt()
 
-    private var offsetX = AutoMinerModConfig.load().hudX
-    private var offsetY = AutoMinerModConfig.load().hudY
+    private var offsetX = 6
+    private var offsetY = 6
 
     /** Position du panneau (coin haut-gauche), modifiable depuis l'écran de config. */
     fun applyConfig(config: AutoMinerModConfig) {

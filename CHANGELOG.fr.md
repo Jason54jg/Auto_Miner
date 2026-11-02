@@ -4,6 +4,9 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.45
+- Audit / cohérence : initialisation client unique de la config (AutoMiner, HUD, slots outil/bloc), normalisation des valeurs au chargement/sauvegarde, contour latéral basé sur la bonne hauteur avec verrou Y, toggles Obstacles grisés en mode « tout droit », README aligné sur la persistance réelle.
+
 ## 0.0.44
 - **Écran de config refondu** : panneau avec onglets (Général, Tunnel, Obstacles, Affichage), colonne outil/bloc obligatoire, boutons Enregistrer / Annuler.
 - **Navigation intelligente** (onglet Obstacles, activée par défaut sur les configs migrées) : casse plafonds/murs proches, marche d'un bloc vers le bas sous un surplomb, décalage latéral si le tunnel reste bloqué après une pioche AOE. Mode « tout droit seulement » pour retrouver l'ancien comportement.
