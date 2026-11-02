@@ -10,7 +10,9 @@ import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
+import kotlin.math.ceil
 
 /**
  * Creuse tout droit dans la direction figée à l'activation tant que [active] est vrai, en cassant
@@ -35,7 +37,13 @@ object AutoMiner {
 
     private var config = AutoMinerModConfig.load()
     private var target: BlockPos? = null
+    private var targetState: BlockState? = null
+    private var lastDestroyStage = -1
+    private var stalledBreakTicks = 0
     private var stuckTicks = 0
+    private var sessionLevel: Level? = null
+
+    private enum class DescentResult { AT_LEVEL, IN_PROGRESS, BLOCKED }
 
     // Direction figée à l'activation : jamais celle du regard en direct.
     private var baseFacing: Direction? = null
@@ -46,6 +54,7 @@ object AutoMiner {
     }
 
     fun toggle(client: Minecraft) {
+        if (!active && (client.player == null || client.level == null || client.gameMode == null)) return
         active = !active
         val messageKey = if (active) "chat.autominer.enabled" else "chat.autominer.disabled"
         val color = if (active) ChatFormatting.GREEN else ChatFormatting.RED
@@ -53,6 +62,7 @@ object AutoMiner {
         if (active) {
             MiningStats.startSession()
             baseFacing = client.player?.direction
+            sessionLevel = client.level
             stuckTicks = 0
             sidestepDirection = 1
         } else {
@@ -61,25 +71,54 @@ object AutoMiner {
     }
 
     fun reset(client: Minecraft) {
-        client.gameMode?.stopDestroyBlock()
-        target = null
+        clearTarget(client.gameMode)
         baseFacing = null
+        sessionLevel = null
         stuckTicks = 0
         sidestepDirection = 1
+        client.player?.let(::haltHorizontalMovement)
+    }
+
+    /** Arrête aussi la session lors d'une déconnexion ou d'un changement de monde. */
+    fun stop(client: Minecraft) {
+        active = false
+        reset(client)
     }
 
     fun tick(client: Minecraft) {
         if (!active) return
-        val player = client.player ?: return
-        val level = client.level ?: return
-        val gameMode = client.gameMode ?: return
+        val player = client.player
+        val level = client.level
+        val gameMode = client.gameMode
+        if (player == null || level == null || gameMode == null || level !== sessionLevel) {
+            stop(client)
+            return
+        }
+
+        // Au sol, n'avance que si le passage est sûr. En l'air, conserve l'élan du saut
+        // pendant que la logique de descente attend le retour à la couche choisie.
+        if (player.onGround()) haltHorizontalMovement(player)
+        finishTargetIfDestroyed(level, gameMode)
 
         ensureToolEquipped(player)
         // Toujours synchronisée, même pendant la descente Y ou une chute : sinon la tête reste
         // figée dans la direction où le joueur regardait au moment de la chute.
         syncViewToFacing(player)
 
-        if (config.lockYLevel && descendToTargetY(player, level, gameMode)) return
+        if (config.lockYLevel) {
+            when (descendToTargetY(player, level, gameMode)) {
+                DescentResult.AT_LEVEL -> Unit
+                DescentResult.IN_PROGRESS -> {
+                    reactIfStuck(client)
+                    return
+                }
+                DescentResult.BLOCKED -> {
+                    toggle(client)
+                    AlertManager.notifyStuck(client)
+                    return
+                }
+            }
+        }
 
         repeat(config.blocksPerTick.coerceAtLeast(1)) {
             if (!mineOrAdvance(player, level, gameMode)) {
@@ -105,18 +144,19 @@ object AutoMiner {
      * [AutoMinerModConfig.targetY]. Ce n'est pas du vrai pathfinding : juste une descente verticale,
      * qui s'arrête net si elle tombe sur un bloc incassable ou un liquide.
      *
-     * @return vrai tant que la descente n'est pas terminée (le tunnel horizontal doit attendre).
+     * Distingue une descente bloquée d'une hauteur atteinte : aucune casse horizontale
+     * ne doit commencer tant que le joueur n'a pas atteint sa couche.
      */
-    private fun descendToTargetY(player: LocalPlayer, level: Level, gameMode: MultiPlayerGameMode): Boolean {
+    private fun descendToTargetY(player: LocalPlayer, level: Level, gameMode: MultiPlayerGameMode): DescentResult {
         val current = player.blockPosition()
-        if (current.y <= config.targetY) return false
-        if (!player.onGround()) return true
+        if (current.y <= config.targetY) return DescentResult.AT_LEVEL
+        if (!player.onGround()) return DescentResult.IN_PROGRESS
 
         val below = current.below()
-        if (!isBreakable(level, below)) return false
+        if (!isBreakable(level, below) || !isWithinReach(player, below)) return DescentResult.BLOCKED
 
-        breakBlock(below, Direction.DOWN, level, gameMode)
-        return true
+        breakBlock(below, Direction.DOWN, player, level, gameMode)
+        return DescentResult.IN_PROGRESS
     }
 
     /**
@@ -183,25 +223,24 @@ object AutoMiner {
         val standingOn = base.below()
 
         val touchingOres = path
-            .flatMap { pos -> Direction.values().map(pos::relative) }
-            .filter { pos -> pos !in path && pos != standingOn && isVanillaOre(level.getBlockState(pos)) }
+            .flatMap { pos -> listOf(pos) + Direction.values().map(pos::relative) }
+            .filter { pos -> pos != standingOn && isVanillaOre(level.getBlockState(pos)) }
             .distinct()
         val nearbyCustomBlocks = scanForCustomBlock(level, origin, lookahead)
             .filter { it != standingOn }
             .sortedBy { it.distSqr(origin) }
 
-        val current = target?.takeIf { isBreakable(level, it) }
-            ?: (nearbyCustomBlocks + touchingOres + path).firstOrNull { isBreakable(level, it) }
+        val current = target?.takeIf { it != standingOn && isBreakable(level, it) && isWithinReach(player, it) }
+            ?: (nearbyCustomBlocks + touchingOres + path).firstOrNull { isBreakable(level, it) && isWithinReach(player, it) }
 
         if (current == null) {
-            target = null
+            clearTarget(gameMode)
             val moved = advance(player, level, immediate, immediateFeet, facing)
             stuckTicks = if (moved) 0 else stuckTicks + 1
             return false
         }
 
-        stuckTicks = 0
-        return breakBlock(current, facing, level, gameMode)
+        return breakBlock(current, facing, player, level, gameMode)
     }
 
     /** Décale [pos] latéralement par rapport à [facing] : positif = côté horaire, négatif = côté antihoraire. */
@@ -218,22 +257,62 @@ object AutoMiner {
      *
      * @return vrai si le bloc est confirmé détruit.
      */
-    private fun breakBlock(pos: BlockPos, facing: Direction, level: Level, gameMode: MultiPlayerGameMode): Boolean {
+    private fun breakBlock(pos: BlockPos, facing: Direction, player: LocalPlayer, level: Level, gameMode: MultiPlayerGameMode): Boolean {
         val brokenState = level.getBlockState(pos)
         if (pos != target) {
-            gameMode.stopDestroyBlock()
+            clearTarget(gameMode)
             target = pos
+            targetState = brokenState
             gameMode.startDestroyBlock(pos, facing.opposite)
         } else {
             gameMode.continueDestroyBlock(pos, facing.opposite)
         }
 
-        if (!level.getBlockState(pos).isAir) return false
+        if (finishTargetIfDestroyed(level, gameMode)) return true
 
-        gameMode.stopDestroyBlock()
-        target = null
-        MiningStats.recordBreak(brokenState, isPriorityOre(brokenState))
+        val stage = gameMode.destroyStage
+        if (stage > lastDestroyStage) {
+            stalledBreakTicks = 0
+            lastDestroyStage = stage
+        } else {
+            stalledBreakTicks++
+        }
+        // Une pioche lente peut rester plus d'une seconde sur le même stade de fissure.
+        // Le délai suit donc le temps normal de progression, sans attendre indéfiniment
+        // sur un bloc refusé par le serveur ou un mode de jeu.
+        val progress = brokenState.getDestroyProgress(player, level, pos).toDouble()
+        val allowance = if (progress.isFinite() && progress > 0.0) {
+            maxOf(STUCK_THRESHOLD.toDouble(), ceil(0.1 / progress) + STUCK_THRESHOLD)
+        } else STUCK_THRESHOLD.toDouble()
+        stuckTicks = if (stalledBreakTicks >= allowance) STUCK_THRESHOLD else 0
+        return false
+    }
+
+    /** Prend aussi en compte une mise à jour différée et l'eau laissée par un bloc waterlogged. */
+    private fun finishTargetIfDestroyed(level: Level, gameMode: MultiPlayerGameMode): Boolean {
+        val pos = target ?: return false
+        val before = targetState ?: return false
+        val after = level.getBlockState(pos)
+        if (after.block == before.block || (!after.isAir && !after.liquid())) return false
+        MiningStats.recordBreak(before, isPriorityOre(before))
+        clearTarget(gameMode)
+        stuckTicks = 0
         return true
+    }
+
+    private fun clearTarget(gameMode: MultiPlayerGameMode?) {
+        if (target != null) gameMode?.stopDestroyBlock()
+        target = null
+        targetState = null
+        lastDestroyStage = -1
+        stalledBreakTicks = 0
+    }
+
+    private fun isWithinReach(player: LocalPlayer, pos: BlockPos): Boolean {
+        val reach = config.reach
+        return reach.isFinite() && reach > 0.0 &&
+            player.isWithinBlockInteractionRange(pos, 0.0) &&
+            AABB(pos).distanceToSqr(player.eyePosition) <= reach * reach
     }
 
     private fun isVanillaOre(state: BlockState): Boolean = OreBlocks.isOre(state)
@@ -304,7 +383,7 @@ object AutoMiner {
         // Sans verrouillage de couche Y, ou en vol (créatif/spectateur), aucune hauteur à
         // maintenir : le bot ignore les trous et avance tout droit sans se soucier du sol
         // (le bloc devant, lui, reste cassé normalement quoi qu'il arrive : voir mineOrAdvance).
-        if (config.lockYLevel && !player.abilities.flying && feet.any { level.getBlockState(it.below()).isAir }) {
+        if (config.lockYLevel && !player.abilities.flying && feet.any { !hasSafeFloor(level, it.below()) }) {
             if (config.descendUnderOverhangs && smartNavigation() && canStepDownForward(level, feet)) {
                 player.deltaMovement = Vec3(facing.stepX * WALK_SPEED, verticalMotion, facing.stepZ * WALK_SPEED)
                 return true
@@ -312,7 +391,7 @@ object AutoMiner {
             // Trou d'un seul bloc de large : saute par-dessus plutôt que de s'arrêter. Un trou plus large
             // (pas de sol non plus deux blocs après) reste bloquant : on attend/mine plutôt que de tomber.
             val landing = feet.map { it.relative(facing, 1) }
-            if (landing.any { level.getBlockState(it.below()).isAir }) {
+            if (landing.any { !hasSafeFloor(level, it.below()) || !level.getBlockState(it).isAir || !level.getBlockState(it.above()).isAir }) {
                 return tryBypass(player, level, facing)
             }
             if (player.onGround()) verticalMotion = JUMP_VELOCITY
@@ -324,14 +403,12 @@ object AutoMiner {
 
     /** Marche d'un bloc : sol devant absent mais support un bloc plus bas (sous un surplomb / après AOE). */
     private fun canStepDownForward(level: Level, feet: List<BlockPos>): Boolean {
-        for (foot in feet) {
-            if (!level.getBlockState(foot).isAir) continue
-            val support = foot.below()
-            if (level.getBlockState(support).isAir) continue
-            if (level.getBlockState(support).liquid()) continue
-            if (level.getBlockState(foot.above()).isAir && level.getBlockState(foot.above(2)).isAir) return true
+        return feet.all { foot ->
+            level.getBlockState(foot).isAir &&
+                level.getBlockState(foot.above()).isAir &&
+                level.getBlockState(foot.below()).isAir &&
+                hasSafeFloor(level, foot.below(2))
         }
-        return false
     }
 
     /** Décalage latéral si le tunnel est bloqué depuis quelques ticks (pioche AOE, mur résiduel). */
@@ -354,7 +431,16 @@ object AutoMiner {
         if (!level.getBlockState(feet).isAir) return false
         if (!level.getBlockState(feet.above()).isAir) return false
         val ground = feet.below()
-        return !level.getBlockState(ground).isAir && !level.getBlockState(ground).liquid()
+        return hasSafeFloor(level, ground)
+    }
+
+    private fun hasSafeFloor(level: Level, pos: BlockPos): Boolean {
+        val state = level.getBlockState(pos)
+        return state.fluidState.isEmpty && state.isFaceSturdy(level, pos, Direction.UP)
+    }
+
+    private fun haltHorizontalMovement(player: LocalPlayer) {
+        player.deltaMovement = Vec3(0.0, player.deltaMovement.y, 0.0)
     }
 
     /** Direction de minage/déplacement effective : figée à l'activation, jamais celle du regard en direct. */

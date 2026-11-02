@@ -4,6 +4,11 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.46
+- Intègre les corrections avec l'interface à onglets et la navigation de 0.0.45 ; conserve la priorité des minerais en mode intelligent, applique les contrôles de sol aux contournements et marches, et corrige les appels de rendu incompatibles de l'écran de configuration.
+- Corrige les six défauts de l’audit : cibles filtrées selon la portée réelle et arrêt en l’absence de progression, arrêt du minage à la déconnexion/changement de monde, descente Y bloquée sans casse horizontale, vérification du sol et des fluides avant d’avancer ou de sauter, configuration vide/`null` remplacée par les valeurs par défaut, comptage des blocs détruits laissant de l’eau (y compris lors d’une mise à jour différée).
+- Ajoute des scénarios de régression exécutables avec `bash tests/regression/run.sh` ; ils complètent les compilations des trois versions sans remplacer un test dans Minecraft.
+
 ## 0.0.45
 - Audit / cohérence : initialisation client unique de la config (AutoMiner, HUD, slots outil/bloc), normalisation des valeurs au chargement/sauvegarde, contour latéral basé sur la bonne hauteur avec verrou Y, toggles Obstacles grisés en mode « tout droit », README aligné sur la persistance réelle.
 

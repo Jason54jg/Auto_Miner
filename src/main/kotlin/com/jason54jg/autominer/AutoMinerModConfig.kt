@@ -40,7 +40,7 @@ data class AutoMinerModConfig(
             }
             val loaded = runCatching {
                 Files.newBufferedReader(PATH).use { GSON.fromJson(it, AutoMinerModConfig::class.java) }
-            }.getOrElse { AutoMinerModConfig() }
+            }.getOrNull() ?: AutoMinerModConfig()
             val resolved = loaded.migrateIfNeeded().normalized()
             if (resolved != loaded) save(resolved)
             return resolved

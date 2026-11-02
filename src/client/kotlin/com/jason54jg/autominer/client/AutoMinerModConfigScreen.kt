@@ -291,10 +291,10 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
 
     private fun renderPanel(graphics: GuiGraphicsExtractor) {
         graphics.fill(panelLeft, panelTop, panelRight, panelBottom, 0xE0101018.toInt())
-        graphics.hLine(panelLeft, panelRight, panelTop, 0xFF555555.toInt())
-        graphics.hLine(panelLeft, panelRight, panelBottom - 1, 0xFF555555.toInt())
-        graphics.vLine(sidebarRight, panelTop, panelBottom, 0xFF444444.toInt())
-        graphics.vLine(slotColumnLeft - 4, panelTop, panelBottom, 0xFF444444.toInt())
+        graphics.fill(panelLeft, panelTop, panelRight, panelTop + 1, 0xFF555555.toInt())
+        graphics.fill(panelLeft, panelBottom - 1, panelRight, panelBottom, 0xFF555555.toInt())
+        graphics.fill(sidebarRight, panelTop, sidebarRight + 1, panelBottom, 0xFF444444.toInt())
+        graphics.fill(slotColumnLeft - 4, panelTop, slotColumnLeft - 3, panelBottom, 0xFF444444.toInt())
     }
 
     private fun renderSlotColumn(graphics: GuiGraphicsExtractor, white: Int, muted: Int) {
@@ -317,7 +317,7 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
         val lines = font.split(Component.literal(text), maxWidth)
         var lineY = y
         for (line in lines) {
-            graphics.text(font, line.string, x, lineY, color, false)
+            graphics.text(font, line, x, lineY, color, false)
             lineY += 9
         }
     }

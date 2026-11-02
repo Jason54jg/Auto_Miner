@@ -28,7 +28,7 @@ loom {
 }
 
 // Script partagé Stonecutter : exécuté une fois par version Minecraft (voir versions/).
-// Le jar s'appelle autominer-<mod>+<mc>.jar (ex : autominer-0.0.43+26.2.jar).
+// Le jar s'appelle autominer-<mod>+<mc>.jar (ex : autominer-0.0.46+26.2.jar).
 base {
 	archivesName = 'autominer'
 }

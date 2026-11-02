@@ -1,0 +1,30 @@
+package net.minecraft.world.level.block
+class Block(val id:String,val hardness:Float=1f,val liquid:Boolean=false,val ore:Boolean=false,val progress:Float=1f,val fluid:Boolean=liquid,val sturdy:Boolean=!liquid && id!="minecraft:air") {
+ val descriptionId get()="block."+id.replace(':','.')
+}
+object Blocks {
+ val AIR=Block("minecraft:air")
+ val STONE=Block("minecraft:stone")
+ val BEDROCK=Block("minecraft:bedrock",-1f)
+ val WATER=Block("minecraft:water",liquid=true)
+ val LAVA=Block("minecraft:lava",liquid=true)
+ val COAL_ORE=Block("minecraft:coal_ore",ore=true)
+val DEEPSLATE_COAL_ORE=Block("minecraft:deepslate_coal_ore",ore=true)
+val IRON_ORE=Block("minecraft:iron_ore",ore=true)
+val DEEPSLATE_IRON_ORE=Block("minecraft:deepslate_iron_ore",ore=true)
+val COPPER_ORE=Block("minecraft:copper_ore",ore=true)
+val DEEPSLATE_COPPER_ORE=Block("minecraft:deepslate_copper_ore",ore=true)
+val GOLD_ORE=Block("minecraft:gold_ore",ore=true)
+val DEEPSLATE_GOLD_ORE=Block("minecraft:deepslate_gold_ore",ore=true)
+val REDSTONE_ORE=Block("minecraft:redstone_ore",ore=true)
+val DEEPSLATE_REDSTONE_ORE=Block("minecraft:deepslate_redstone_ore",ore=true)
+val LAPIS_ORE=Block("minecraft:lapis_ore",ore=true)
+val DEEPSLATE_LAPIS_ORE=Block("minecraft:deepslate_lapis_ore",ore=true)
+val DIAMOND_ORE=Block("minecraft:diamond_ore",ore=true)
+val DEEPSLATE_DIAMOND_ORE=Block("minecraft:deepslate_diamond_ore",ore=true)
+val EMERALD_ORE=Block("minecraft:emerald_ore",ore=true)
+val DEEPSLATE_EMERALD_ORE=Block("minecraft:deepslate_emerald_ore",ore=true)
+val NETHER_GOLD_ORE=Block("minecraft:nether_gold_ore",ore=true)
+val NETHER_QUARTZ_ORE=Block("minecraft:nether_quartz_ore",ore=true)
+val ANCIENT_DEBRIS=Block("minecraft:ancient_debris",ore=true)
+}

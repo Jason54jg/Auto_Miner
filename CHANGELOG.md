@@ -4,6 +4,11 @@
 
 Each new request bumps the version by `0.0.1`.
 
+## 0.0.46
+- Integrate fixes with the tabbed interface and navigation from 0.0.45; preserve ore priority in smart mode, check safe support for sidesteps and downward steps, and fix incompatible configuration screen rendering calls.
+- Fix all six audit findings: filter targets by actual interaction reach and stop stalled mining, stop on disconnect/world changes, prevent horizontal mining when Y descent is blocked, check solid support and fluids before walking or jumping, fall back to defaults for empty/`null` configuration files, and count destroyed blocks that leave water, including deferred updates.
+- Add regression scenarios runnable with `bash tests/regression/run.sh`; these supplement the three version builds and do not replace testing in Minecraft.
+
 ## 0.0.45
 - Audit / consistency: single client config bootstrap (AutoMiner, HUD, tool/block slots), value normalization on load/save, sidestep floor height with Y lock, Obstacles toggles disabled in forward-only mode, README aligned with actual persistence.
 

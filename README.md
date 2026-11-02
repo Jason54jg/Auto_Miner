@@ -4,7 +4,7 @@
 
 Fabric mod for Minecraft **26.1 – 26.3** that digs a straight tunnel automatically: a key toggles mining, the player advances while breaking the blocks in front of them, and systematically breaks any ore touching the tunnel.
 
-Current version: **0.0.45** (see [CHANGELOG.md](CHANGELOG.md))
+Current version: **0.0.46** (see [CHANGELOG.md](CHANGELOG.md))
 
 ## Features
 
@@ -65,6 +65,14 @@ Current version: **0.0.45** (see [CHANGELOG.md](CHANGELOG.md))
 ```
 
 The generated `.jar` files (`autominer-<version>+<mc>.jar`) are in `versions/<mc>/build/libs/`.
+
+## Regression checks
+
+```bash
+bash tests/regression/run.sh
+```
+
+These scenarios exercise the mining and session logic with local Minecraft/Fabric doubles. See [test details](tests/regression/README.md). Run the three builds above as well; in-game checks remain necessary for rendering and server behavior.
 
 ## Installation
 
