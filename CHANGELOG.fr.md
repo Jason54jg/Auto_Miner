@@ -4,6 +4,10 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.44
+- Corrige les six défauts de l’audit : cibles filtrées selon la portée réelle et arrêt en l’absence de progression, arrêt du minage à la déconnexion/changement de monde, descente Y bloquée sans casse horizontale, vérification du sol et des fluides avant d’avancer ou de sauter, configuration vide/`null` remplacée par les valeurs par défaut, comptage des blocs détruits laissant de l’eau (y compris lors d’une mise à jour différée).
+- Ajoute des scénarios de régression exécutables avec `bash tests/regression/run.sh` ; ils complètent les compilations des trois versions sans remplacer un test dans Minecraft.
+
 ## 0.0.43
 - Support multi-versions via Stonecutter : un jar par Minecraft **26.1.x** (26.1, 26.1.1, 26.1.2), **26.2** et **26.3** (`autominer-<version>+<mc>.jar` — voir le README pour les versions Fabric API / Mod Menu correspondantes). Le code 26.1 garde les API d'avant la 26.2 (`KeyBinding`, `ClientCommandManager`, `GuiGraphics`, `displayClientMessage`...).
 - Fix : les alertes de mention n'écoutaient que le chat des joueurs (`CHAT`) — les annonces serveur (`GAME`), qui peuvent aussi contenir le pseudo, déclenchent l'alerte aussi.

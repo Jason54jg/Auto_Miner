@@ -4,6 +4,10 @@
 
 Each new request bumps the version by `0.0.1`.
 
+## 0.0.44
+- Fix all six audit findings: filter targets by actual interaction reach and stop stalled mining, stop on disconnect/world changes, prevent horizontal mining when Y descent is blocked, check solid support and fluids before walking or jumping, fall back to defaults for empty/`null` configuration files, and count destroyed blocks that leave water, including deferred updates.
+- Add regression scenarios runnable with `bash tests/regression/run.sh`; these supplement the three version builds and do not replace testing in Minecraft.
+
 ## 0.0.43
 - Multi-version support via Stonecutter: separate jars for Minecraft **26.1.x** (26.1, 26.1.1, 26.1.2), **26.2** and **26.3** (`autominer-<version>+<mc>.jar` — see README for the matching Fabric API / Mod Menu versions). The 26.1 code path keeps the pre-26.2 APIs (`KeyBinding`, `ClientCommandManager`, `GuiGraphics`, `displayClientMessage`...).
 - Fix: mention alerts only listened to player chat (`CHAT`) — server announcements (`GAME`), which can also contain the player's name, now trigger the alert too.

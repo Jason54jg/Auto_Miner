@@ -32,7 +32,7 @@ data class AutoMinerModConfig(
             }
             return runCatching {
                 Files.newBufferedReader(PATH).use { GSON.fromJson(it, AutoMinerModConfig::class.java) }
-            }.getOrElse { AutoMinerModConfig() }
+            }.getOrNull() ?: AutoMinerModConfig()
         }
 
         fun save(config: AutoMinerModConfig) {

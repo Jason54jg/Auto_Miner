@@ -4,7 +4,7 @@
 
 Mod Fabric pour Minecraft **26.1 – 26.3** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.43** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
+Version actuelle : **0.0.44** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
 
 ## Fonctionnalités
 
@@ -63,6 +63,14 @@ Version actuelle : **0.0.43** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
 ```
 
 Les `.jar` générés (`autominer-<version>+<mc>.jar`) se trouvent dans `versions/<mc>/build/libs/`.
+
+## Vérifications de régression
+
+```bash
+bash tests/regression/run.sh
+```
+
+Ces scénarios exécutent la logique de minage et de session avec des doubles locaux de Minecraft/Fabric. Voir les [détails des tests](tests/regression/README.md). Effectuer aussi les trois compilations ci-dessus ; les contrôles en jeu restent nécessaires pour le rendu et le comportement serveur.
 
 ## Installation
 

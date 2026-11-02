@@ -76,10 +76,18 @@ object AutoMinerModClient : ClientModInitializer {
             if (AutoMiner.active) AlertManager.checkMention(Minecraft.getInstance(), message)
         }
 
-        // Un changement de monde/dimension déplace le joueur sans téléportation : repart d'une
-        // position saine au lieu de déclencher une fausse alerte au premier tick actif.
-        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
+        val resetSession = { client: Minecraft ->
+            AutoMiner.stop(client)
             AlertManager.resetTeleportTracking()
+            mouseUngrabbed = false
+            while (toggleKey.consumeClick()) { /* Oublie les touches de la session précédente. */ }
+            while (ungrabKey.consumeClick()) { }
+        }
+        ClientPlayConnectionEvents.JOIN.register { _, _, client ->
+            resetSession(client)
+        }
+        ClientPlayConnectionEvents.DISCONNECT.register { _, client ->
+            resetSession(client)
         }
 
         HudElementRegistry.addLast(Identifier.fromNamespaceAndPath("autominer", "mining_hud")) { graphics, _ ->
