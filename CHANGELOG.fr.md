@@ -4,6 +4,10 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.44
+- **Écran de config refondu** : panneau avec onglets (Général, Tunnel, Obstacles, Affichage), colonne outil/bloc obligatoire, boutons Enregistrer / Annuler.
+- **Navigation intelligente** (onglet Obstacles, activée par défaut sur les configs migrées) : casse plafonds/murs proches, marche d'un bloc vers le bas sous un surplomb, décalage latéral si le tunnel reste bloqué après une pioche AOE. Mode « tout droit seulement » pour retrouver l'ancien comportement.
+
 ## 0.0.43
 - Support multi-versions via Stonecutter : un jar par Minecraft **26.1.x** (26.1, 26.1.1, 26.1.2), **26.2** et **26.3** (`autominer-<version>+<mc>.jar` — voir le README pour les versions Fabric API / Mod Menu correspondantes). Le code 26.1 garde les API d'avant la 26.2 (`KeyBinding`, `ClientCommandManager`, `GuiGraphics`, `displayClientMessage`...).
 - Fix : les alertes de mention n'écoutaient que le chat des joueurs (`CHAT`) — les annonces serveur (`GAME`), qui peuvent aussi contenir le pseudo, déclenchent l'alerte aussi.
