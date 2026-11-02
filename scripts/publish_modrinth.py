@@ -12,14 +12,14 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 API = 'https://api.modrinth.com/v2'
 ICON = ROOT / 'site/assets/logo.webp'
-SITE = 'https://jason54jg.github.io/MiningMod/'
-GITHUB = 'https://github.com/Jason54jg/MiningMod'
+SITE = 'https://jason54jg.github.io/Auto_Miner/'
+GITHUB = 'https://github.com/Jason54jg/Auto_Miner'
 
 
 def api_request(method, path, token, body=None, content_type='application/json'):
     request = Request(API + path, data=body, method=method, headers={
         'Authorization': token,
-        'User-Agent': 'Jason54jg/MiningMod-branding (github.com/Jason54jg/MiningMod)',
+        'User-Agent': 'Jason54jg/Auto_Miner-branding (github.com/Jason54jg/Auto_Miner)',
         'Content-Type': content_type,
     })
     try:

@@ -4,6 +4,10 @@
 
 Chaque nouvelle demande incrémente la version de `0.0.1`.
 
+## 0.0.49
+- Corrige les liens GitHub, Modrinth et Pages après le renommage du dépôt en `Auto_Miner`, y compris la page d’accueil déclarée dans les trois JAR.
+- Le workflow utilise l’adresse fournie par GitHub Pages pour générer les métadonnées du site et vérifie le contenu réellement publié. La publication doit utiliser GitHub Actions pour éviter qu’un build Jekyll de la racine ne remplace le site.
+
 ## 0.0.48
 - **Mise en page de l’écran de config** : espacement dynamique pour les libellés outil/bloc obligatoire (plus de chevauchement quand le texte revient à la ligne) ; sous-titre contenu dans le panneau principal avec retour à la ligne, sans déborder sur la barre latérale.
 - **Onglets** : barre latérale un peu plus large, libellés lisibles (l’onglet actif n’utilise plus le style « désactivé » de Minecraft) ; libellé tunnel raccourci en « Tun. » si besoin.

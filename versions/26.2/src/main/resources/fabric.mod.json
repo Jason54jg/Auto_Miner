@@ -8,9 +8,9 @@
 		"Jason54jg"
 	],
 	"contact": {
-		"sources": "https://github.com/jason54jg/miningmod",
-		"homepage": "https://jason54jg.github.io/MiningMod/",
-		"issues": "https://github.com/Jason54jg/MiningMod/issues"
+		"sources": "https://github.com/Jason54jg/Auto_Miner",
+		"homepage": "https://jason54jg.github.io/Auto_Miner/",
+		"issues": "https://github.com/Jason54jg/Auto_Miner/issues"
 	},
 	"license": "MIT",
 	"environment": "client",

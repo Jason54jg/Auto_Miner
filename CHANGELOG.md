@@ -4,6 +4,10 @@
 
 Each new request bumps the version by `0.0.1`.
 
+## 0.0.49
+- Fix GitHub, Modrinth and Pages links after renaming the repository to `Auto_Miner`, including homepage metadata in all three JARs.
+- Use the address reported by GitHub Pages when generating site metadata and check the actual published content. Use GitHub Actions publishing so a legacy root Jekyll build cannot overwrite the site.
+
 ## 0.0.48
 - **Config screen layout**: dynamic spacing for the tool/mandatory-block labels so wrapped text no longer overlaps; subtitle stays in the main panel with word wrap instead of crossing the sidebar divider.
 - **Tab buttons**: wider sidebar, readable labels (selected tab no longer uses the disabled Minecraft style); tab label shortened to `Tun.` where needed.

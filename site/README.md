@@ -16,7 +16,7 @@ sont des exports compressés des mêmes visuels pour limiter le poids des pages.
 
 Le workflow `.github/workflows/pages.yml` valide le site sur les pull requests
 et déploie les changements de `master`. Adresse prévue :
-`https://jason54jg.github.io/MiningMod/`.
+`https://jason54jg.github.io/Auto_Miner/`.
 
 ## Activation de GitHub Pages
 
@@ -34,3 +34,14 @@ la branche de publication habituelle, sans écraser le contenu d’autres branch
 Pour vérifier après activation : consulter le workflow **Build and deploy information
 site**, attendre le succès du job `deploy`, puis contrôler les versions anglaise
 et française. Les contrôles locaux ne constituent pas une preuve de déploiement.
+
+## Une page README/Jekyll s'affiche à la place du site
+
+Ne pas utiliser **Deploy from a branch → master / (root)** : cela publie les
+fichiers du dépôt et peut écraser le site généré par le workflow. La source doit
+être **GitHub Actions**. Le workflow lit l'URL réelle de Pages, génère `_site`,
+puis vérifie les deux langues, les ressources et la version réellement servie.
+
+```bash
+python3 scripts/check_deployed_site.py https://jason54jg.github.io/Auto_Miner/
+```

@@ -1,10 +1,10 @@
-![Auto Miner — Une touche, le minage continue.](https://raw.githubusercontent.com/Jason54jg/MiningMod/master/site/assets/banner.png)
+![Auto Miner — Une touche, le minage continue.](https://raw.githubusercontent.com/Jason54jg/Auto_Miner/master/site/assets/banner.png)
 
 **Choisissez une direction. Appuyez sur B. Le minage continue.**
 
 Auto Miner est un **mod client Fabric** qui creuse un tunnel et vous fait avancer en donnant la priorité aux minerais proches. Les règles de survie restent les mêmes : l’outil, la dureté du bloc, les objets lâchés et l’XP comptent toujours.
 
-[Installation et compatibilité](https://jason54jg.github.io/MiningMod/fr/#install) · [English guide](https://jason54jg.github.io/MiningMod/) · [Code et problèmes](https://github.com/Jason54jg/MiningMod)
+[Installation et compatibilité](https://jason54jg.github.io/Auto_Miner/fr/#install) · [English guide](https://jason54jg.github.io/Auto_Miner/) · [Code et problèmes](https://github.com/Jason54jg/Auto_Miner)
 
 ## Moins de répétition. Plus de contrôle.
 
@@ -34,4 +34,4 @@ Auto Miner vérifie la portée, arrête un minage qui ne progresse plus et termi
 
 Sur un serveur, **vérifiez que le règlement autorise l’automatisation du minage** avant de l’utiliser.
 
-[Guide complet](https://jason54jg.github.io/MiningMod/fr/) · [Signaler un problème](https://github.com/Jason54jg/MiningMod/issues)
+[Guide complet](https://jason54jg.github.io/Auto_Miner/fr/) · [Signaler un problème](https://github.com/Jason54jg/Auto_Miner/issues)

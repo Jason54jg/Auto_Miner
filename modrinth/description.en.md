@@ -1,10 +1,10 @@
-![Auto Miner — One key. Keep mining.](https://raw.githubusercontent.com/Jason54jg/MiningMod/master/site/assets/banner.png)
+![Auto Miner — One key. Keep mining.](https://raw.githubusercontent.com/Jason54jg/Auto_Miner/master/site/assets/banner.png)
 
 **Point forward. Press B. Keep mining.**
 
 Auto Miner is a **client-side Fabric mod** that digs a tunnel and moves you forward, giving nearby ores priority. It follows normal survival breaking mechanics: your tool, block hardness, drops and XP still matter.
 
-[Installation & compatibility](https://jason54jg.github.io/MiningMod/#install) · [Guide en français](https://jason54jg.github.io/MiningMod/fr/) · [Source & issues](https://github.com/Jason54jg/MiningMod)
+[Installation & compatibility](https://jason54jg.github.io/Auto_Miner/#install) · [Guide en français](https://jason54jg.github.io/Auto_Miner/fr/) · [Source & issues](https://github.com/Jason54jg/Auto_Miner)
 
 ## Less repetition. More control.
 
@@ -34,4 +34,4 @@ Auto Miner checks interaction reach, stops stalled mining and ends the session o
 
 On a server, **check that its rules allow mining automation** before using the mod.
 
-[Read the full guide](https://jason54jg.github.io/MiningMod/) · [Report a problem](https://github.com/Jason54jg/MiningMod/issues)
+[Read the full guide](https://jason54jg.github.io/Auto_Miner/) · [Report a problem](https://github.com/Jason54jg/Auto_Miner/issues)

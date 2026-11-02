@@ -9,9 +9,9 @@ from string import Template
 from urllib.parse import urlencode
 
 ROOT = Path(__file__).resolve().parents[1]
-SITE_URL = 'https://jason54jg.github.io/MiningMod'
+SITE_URL = 'https://jason54jg.github.io/Auto_Miner'
 MODRINTH_URL = 'https://modrinth.com/mod/auto-miners'
-GITHUB_URL = 'https://github.com/Jason54jg/MiningMod'
+GITHUB_URL = 'https://github.com/Jason54jg/Auto_Miner'
 
 
 def properties(path):
@@ -40,6 +40,7 @@ def build(output, site_url=SITE_URL):
     shutil.copyfile(ROOT / 'src/main/resources/assets/autominer/textures/logo.png', output / 'assets/logo.png')
     (output / '.nojekyll').touch()
     release = release_data()
+    release['site_url'] = site_url.rstrip('/') + '/'
     latest = release['minecraft'][-1]
     content = json.loads((ROOT / 'site/content.json').read_text())
     template = Template((ROOT / 'site/template.html').read_text())

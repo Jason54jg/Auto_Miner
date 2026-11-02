@@ -4,11 +4,11 @@
 
 ![Auto Miner — One key. Keep mining.](site/assets/banner.webp)
 
-[Information site](https://jason54jg.github.io/MiningMod/) · [Modrinth](https://modrinth.com/mod/auto-miners) · [Site deployment](site/README.md) · [Modrinth presentation](modrinth/README.md)
+[Information site](https://jason54jg.github.io/Auto_Miner/) · [Modrinth](https://modrinth.com/mod/auto-miners) · [Site deployment](site/README.md) · [Modrinth presentation](modrinth/README.md)
 
 Fabric mod for Minecraft **26.1 – 26.3** that digs a straight tunnel automatically: a key toggles mining, the player advances while breaking the blocks in front of them, and systematically breaks any ore touching the tunnel.
 
-Current version: **0.0.48** (see [CHANGELOG.md](CHANGELOG.md))
+Current version: **0.0.49** (see [CHANGELOG.md](CHANGELOG.md))
 
 ## Features
 

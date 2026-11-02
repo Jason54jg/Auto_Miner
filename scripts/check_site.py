@@ -13,10 +13,16 @@ class Page(HTMLParser):
     def __init__(self, text):
         super().__init__()
         self.ids, self.links, self.images = set(), [], []
+        self.canonical = None
+        self.generator = None
         self.h1 = 0
         self.feed(text)
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == 'link' and attrs.get('rel') == 'canonical':
+            self.canonical = attrs.get('href')
+        if tag == 'meta' and attrs.get('name') == 'generator':
+            self.generator = attrs.get('content')
         if 'id' in attrs:
             assert attrs['id'] not in self.ids, f'Duplicate id: {attrs["id"]}'
             self.ids.add(attrs['id'])
@@ -32,10 +38,14 @@ class Page(HTMLParser):
 
 def check(output):
     output = output.resolve()
+    release = json.loads((output / 'release.json').read_text())
     for relative in ['index.html', 'fr/index.html']:
         path = output / relative
         text = path.read_text()
         page = Page(text)
+        expected_url = release['site_url'] + ('fr/' if relative.startswith('fr/') else '')
+        assert page.canonical == expected_url, f'{relative}: wrong canonical URL'
+        assert page.generator == 'Auto Miner static site', f'{relative}: wrong site generator'
         assert page.h1 == 1, f'{relative}: expected one main heading'
         assert '$heading' not in text and '$base' not in text, 'Unresolved template'
         for url in page.links + page.images:
@@ -50,7 +60,6 @@ def check(output):
         print(f'PASS {relative}: headings, alt text, local links and anchors')
     canonical = ROOT / 'src/main/resources/assets/autominer/textures/logo.png'
     assert hashlib.sha256(canonical.read_bytes()).digest() == hashlib.sha256((output / 'assets/logo.png').read_bytes()).digest()
-    release = json.loads((output / 'release.json').read_text())
     assert len(release['minecraft']) == 3
     for row in release['minecraft']:
         assert all(row[key] for key in ['version', 'fabric_api', 'fabric_kotlin', 'modmenu'])
