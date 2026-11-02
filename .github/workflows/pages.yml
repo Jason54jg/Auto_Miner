@@ -69,15 +69,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Select GitHub Actions as the publishing source
+      - name: Check the publishing source
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           source_type="$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type')"
           if [ "$source_type" != "workflow" ]; then
-            gh api --method PUT "repos/$GITHUB_REPOSITORY/pages" -f build_type=workflow --silent
+            echo "::warning title=Competing Pages publications::Select GitHub Actions in Settings > Pages > Source. A legacy branch build can overwrite this site."
+            echo "Select **GitHub Actions** at https://github.com/$GITHUB_REPOSITORY/settings/pages to disable the competing legacy branch publication." >> "$GITHUB_STEP_SUMMARY"
           fi
-          test "$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type')" = "workflow"
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
