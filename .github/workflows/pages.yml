@@ -1,0 +1,61 @@
+name: Build and deploy information site
+on:
+  push:
+    branches: [master]
+    paths:
+      - "site/**"
+      - "scripts/build_site.py"
+      - "scripts/check_site.py"
+      - "src/main/resources/assets/autominer/textures/logo.png"
+      - "gradle.properties"
+      - "versions/**/gradle.properties"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "site/**"
+      - "scripts/build_site.py"
+      - "scripts/check_site.py"
+      - "src/main/resources/assets/autominer/textures/logo.png"
+      - "gradle.properties"
+      - "versions/**/gradle.properties"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build bilingual static pages
+        run: python scripts/build_site.py
+      - name: Check local links, assets and JavaScript
+        run: |
+          python scripts/check_site.py
+          node --check site/assets/site.js
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

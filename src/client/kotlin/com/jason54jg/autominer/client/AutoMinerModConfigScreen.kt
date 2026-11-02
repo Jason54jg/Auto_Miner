@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
@@ -17,6 +18,7 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.BlockHitResult
 
 class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.translatable("screen.autominer.title")) {
+    private val logo = Identifier.fromNamespaceAndPath("autominer", "textures/logo.png")
     private enum class Tab {
         GENERAL, TUNNEL, OBSTACLES, DISPLAY
     }
@@ -274,12 +276,13 @@ class AutoMinerModConfigScreen(private val parent: Screen?) : Screen(Component.t
     }
 
     override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta)
         renderPanel(graphics)
+        super.extractRenderState(graphics, mouseX, mouseY, delta)
         val white = 0xFFFFFFFF.toInt()
         val muted = 0xFFAAAAAA.toInt()
-        graphics.text(font, title.string, panelLeft + 10, panelTop + 8, white, true)
-        graphics.text(font, Component.translatable("screen.autominer.subtitle").string, panelLeft + 10, panelTop + 18, muted, false)
+        graphics.blit(logo, panelLeft + 8, panelTop + 4, panelLeft + 32, panelTop + 28, 0f, 1f, 0f, 1f)
+        graphics.text(font, title.string, panelLeft + 38, panelTop + 8, white, true)
+        graphics.text(font, Component.translatable("screen.autominer.subtitle").string, panelLeft + 38, panelTop + 18, muted, false)
         for (row in rowLabels) {
             graphics.text(font, Component.translatable(row.key).string, row.x, row.y + 6, white, true)
         }

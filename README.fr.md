@@ -2,9 +2,13 @@
 
 *[English](README.md) | Français*
 
+![Auto Miner — Une touche, le minage continue.](site/assets/banner.webp)
+
+[Site d’information](https://jason54jg.github.io/MiningMod/fr/) · [Modrinth](https://modrinth.com/mod/auto-miners) · [Publication du site](site/README.md) · [Présentation Modrinth](modrinth/README.md)
+
 Mod Fabric pour Minecraft **26.1 – 26.3** qui creuse un tunnel tout droit automatiquement : une touche active le minage, le joueur avance en cassant les blocs devant lui, et casse systématiquement tout minerai qui touche le tunnel.
 
-Version actuelle : **0.0.46** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
+Version actuelle : **0.0.47** (voir [CHANGELOG.fr.md](CHANGELOG.fr.md))
 
 ## Fonctionnalités
 

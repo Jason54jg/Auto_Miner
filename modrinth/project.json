@@ -1,0 +1,8 @@
+{
+  "slug": "auto-miners",
+  "title": "Auto Miner",
+  "description": {
+    "en": "One key to dig forward. A Fabric client mod with ore priority, configurable tunnels, smart obstacle handling and a session HUD.",
+    "fr": "Une touche pour creuser devant vous. Un mod client Fabric avec priorité aux minerais, tunnels réglables, gestion des obstacles et HUD de session."
+  }
+}

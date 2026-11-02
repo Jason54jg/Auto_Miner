@@ -1,0 +1,50 @@
+name: Update Modrinth presentation
+on:
+  push:
+    branches: [master]
+    paths:
+      - "modrinth/**"
+      - "site/assets/logo.webp"
+      - "site/assets/banner.png"
+      - "scripts/publish_modrinth.py"
+      - ".github/workflows/modrinth-presentation.yml"
+  workflow_dispatch:
+    inputs:
+      language:
+        description: Description language
+        type: choice
+        options: [en, fr]
+        default: en
+      dry_run:
+        description: Preview the payload without changing Modrinth
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: modrinth-presentation
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Update project description, links and icon
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          DESCRIPTION_LANGUAGE: ${{ inputs.language || 'en' }}
+          DRY_RUN: ${{ inputs.dry_run || false }}
+        run: |
+          if [ -z "$MODRINTH_TOKEN" ] && [ "$DRY_RUN" != "true" ]; then
+            echo "::notice title=Modrinth not synchronized::Add the MODRINTH_TOKEN repository secret to publish the prepared description and icon. No remote change was made."
+            exit 0
+          fi
+          if [ "$DRY_RUN" = "true" ]; then
+            python scripts/publish_modrinth.py --language "$DESCRIPTION_LANGUAGE" --dry-run
+          else
+            python scripts/publish_modrinth.py --language "$DESCRIPTION_LANGUAGE"
+          fi

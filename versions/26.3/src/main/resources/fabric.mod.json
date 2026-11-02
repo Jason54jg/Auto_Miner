@@ -3,12 +3,14 @@
 	"id": "autominer",
 	"version": "${version}",
 	"name": "Auto Miner",
-	"description": "Mine et avance tout droit automatiquement en maintenant une touche, en cassant systématiquement les minerais rencontrés autour du tunnel.",
+	"description": "A client-side Fabric mod for automatic tunnel mining, ore priority and configurable navigation.",
 	"authors": [
 		"Jason54jg"
 	],
 	"contact": {
-		"sources": "https://github.com/jason54jg/miningmod"
+		"sources": "https://github.com/jason54jg/miningmod",
+		"homepage": "https://jason54jg.github.io/MiningMod/",
+		"issues": "https://github.com/Jason54jg/MiningMod/issues"
 	},
 	"license": "MIT",
 	"environment": "client",
@@ -41,5 +43,6 @@
 	},
 	"suggests": {
 		"modmenu": "*"
-	}
+	},
+	"icon": "assets/autominer/textures/logo.png"
 }

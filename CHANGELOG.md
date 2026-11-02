@@ -4,6 +4,11 @@
 
 Each new request bumps the version by `0.0.1`.
 
+## 0.0.47
+- New visual identity: cyan/copper pickaxe logo and banner, icon metadata in all three JARs and a logo in the configuration screen. Draw the panel before its widgets so it does not cover them.
+- Bilingual responsive information site with no build dependencies, deployed from master through GitHub Pages Actions. Versions and dependencies come from Gradle.
+- Rewritten English/French Modrinth descriptions and a manual workflow to sync the description, links and icon using a Modrinth secret.
+
 ## 0.0.46
 - Integrate fixes with the tabbed interface and navigation from 0.0.45; preserve ore priority in smart mode, check safe support for sidesteps and downward steps, and fix incompatible configuration screen rendering calls.
 - Fix all six audit findings: filter targets by actual interaction reach and stop stalled mining, stop on disconnect/world changes, prevent horizontal mining when Y descent is blocked, check solid support and fluids before walking or jumping, fall back to defaults for empty/`null` configuration files, and count destroyed blocks that leave water, including deferred updates.
