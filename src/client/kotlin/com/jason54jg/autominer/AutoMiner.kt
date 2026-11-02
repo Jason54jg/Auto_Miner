@@ -39,6 +39,7 @@ object AutoMiner {
 
     // Direction figée à l'activation : jamais celle du regard en direct.
     private var baseFacing: Direction? = null
+    private var sidestepDirection = 1
 
     fun applyConfig(newConfig: AutoMinerModConfig) {
         config = newConfig
@@ -53,6 +54,7 @@ object AutoMiner {
             MiningStats.startSession()
             baseFacing = client.player?.direction
             stuckTicks = 0
+            sidestepDirection = 1
         } else {
             reset(client)
         }
@@ -63,6 +65,7 @@ object AutoMiner {
         target = null
         baseFacing = null
         stuckTicks = 0
+        sidestepDirection = 1
     }
 
     fun tick(client: Minecraft) {
@@ -156,6 +159,11 @@ object AutoMiner {
         val lookahead = config.reach.toInt().coerceIn(1, MAX_LOOKAHEAD)
         val halfWidth = config.tunnelWidth.coerceIn(0, 2)
         val lateralOffsets = -halfWidth..halfWidth
+        val obstacleReach = if (smartNavigation()) {
+            config.obstacleDetectionReach.coerceIn(1, MAX_LOOKAHEAD)
+        } else {
+            0
+        }
 
         // Tête avant pieds : le joueur regarde à hauteur des yeux (viseur au niveau de la tête), donc
         // c'est ce bloc-là qui doit visiblement se casser en premier, pas celui du sol sous le viseur.
@@ -165,7 +173,7 @@ object AutoMiner {
                 val lateral = offsetPosition(forward, facing, offset)
                 listOf(lateral.above(), lateral)
             }
-        }
+        } + obstacleBlocks(level, origin, facing, lateralOffsets, obstacleReach)
         val immediateForward = origin.relative(facing, 1)
         val immediateFeet = lateralOffsets.map { offset -> offsetPosition(immediateForward, facing, offset) }
         val immediate = immediateFeet.flatMap { listOf(it, it.above()) }
@@ -187,7 +195,8 @@ object AutoMiner {
 
         if (current == null) {
             target = null
-            stuckTicks = if (advance(player, level, immediate, immediateFeet, facing)) 0 else stuckTicks + 1
+            val moved = advance(player, level, immediate, immediateFeet, facing)
+            stuckTicks = if (moved) 0 else stuckTicks + 1
             return false
         }
 
@@ -250,24 +259,102 @@ object AutoMiner {
         return positions.filter { pos -> isCustomBlock(level.getBlockState(pos)) }
     }
 
+    /** Plafonds / murs latéraux proches à inclure dans la file de casse (mode intelligent). */
+    private fun obstacleBlocks(
+        level: Level,
+        origin: BlockPos,
+        facing: Direction,
+        lateralOffsets: IntRange,
+        reach: Int
+    ): List<BlockPos> {
+        if (reach <= 0) return emptyList()
+        val blocks = ArrayList<BlockPos>()
+        for (step in 1..reach) {
+            val forward = origin.relative(facing, step)
+            for (offset in lateralOffsets) {
+                val lateral = offsetPosition(forward, facing, offset)
+                blocks.add(lateral.above(2))
+            }
+            val left = offsetPosition(forward, facing, -1)
+            val right = offsetPosition(forward, facing, 1)
+            blocks.add(left)
+            blocks.add(left.above())
+            blocks.add(right)
+            blocks.add(right.above())
+        }
+        return blocks.filter { isBreakable(level, it) }.distinct()
+    }
+
+    private fun smartNavigation(): Boolean =
+        config.obstacleNavigationMode == ObstacleNavigationMode.SMART
+
     /** @return vrai si le joueur a effectivement avancé (ou sauté), faux si un obstacle bloque le passage. */
-    private fun advance(player: LocalPlayer, level: Level, immediate: List<BlockPos>, feet: List<BlockPos>, facing: Direction): Boolean {
-        if (immediate.any { !level.getBlockState(it).isAir }) return false
+    private fun advance(
+        player: LocalPlayer,
+        level: Level,
+        immediate: List<BlockPos>,
+        feet: List<BlockPos>,
+        facing: Direction
+    ): Boolean {
+        if (immediate.any { !level.getBlockState(it).isAir }) {
+            return tryBypass(player, level, facing)
+        }
 
         var verticalMotion = player.deltaMovement.y
         // Sans verrouillage de couche Y, ou en vol (créatif/spectateur), aucune hauteur à
         // maintenir : le bot ignore les trous et avance tout droit sans se soucier du sol
         // (le bloc devant, lui, reste cassé normalement quoi qu'il arrive : voir mineOrAdvance).
         if (config.lockYLevel && !player.abilities.flying && feet.any { level.getBlockState(it.below()).isAir }) {
+            if (config.descendUnderOverhangs && smartNavigation() && canStepDownForward(level, feet)) {
+                player.deltaMovement = Vec3(facing.stepX * WALK_SPEED, verticalMotion, facing.stepZ * WALK_SPEED)
+                return true
+            }
             // Trou d'un seul bloc de large : saute par-dessus plutôt que de s'arrêter. Un trou plus large
             // (pas de sol non plus deux blocs après) reste bloquant : on attend/mine plutôt que de tomber.
             val landing = feet.map { it.relative(facing, 1) }
-            if (landing.any { level.getBlockState(it.below()).isAir }) return false
+            if (landing.any { level.getBlockState(it.below()).isAir }) {
+                return tryBypass(player, level, facing)
+            }
             if (player.onGround()) verticalMotion = JUMP_VELOCITY
         }
 
         player.deltaMovement = Vec3(facing.stepX * WALK_SPEED, verticalMotion, facing.stepZ * WALK_SPEED)
         return true
+    }
+
+    /** Marche d'un bloc : sol devant absent mais support un bloc plus bas (sous un surplomb / après AOE). */
+    private fun canStepDownForward(level: Level, feet: List<BlockPos>): Boolean {
+        for (foot in feet) {
+            if (!level.getBlockState(foot).isAir) continue
+            val support = foot.below()
+            if (level.getBlockState(support).isAir) continue
+            if (level.getBlockState(support).liquid()) continue
+            if (level.getBlockState(foot.above()).isAir && level.getBlockState(foot.above(2)).isAir) return true
+        }
+        return false
+    }
+
+    /** Décalage latéral si le tunnel est bloqué depuis quelques ticks (pioche AOE, mur résiduel). */
+    private fun tryBypass(player: LocalPlayer, level: Level, facing: Direction): Boolean {
+        if (!smartNavigation() || !config.bypassObstacles || stuckTicks < 4) return false
+        val side = if (sidestepDirection >= 0) facing.clockWise else facing.counterClockWise
+        val sidePos = player.blockPosition().relative(side)
+        val floorY = if (config.lockYLevel) config.targetY else player.blockPosition().y
+        if (!isWalkableColumn(level, sidePos, floorY)) {
+            sidestepDirection = -sidestepDirection
+            return false
+        }
+        sidestepDirection = -sidestepDirection
+        player.deltaMovement = Vec3(side.stepX * WALK_SPEED, player.deltaMovement.y, side.stepZ * WALK_SPEED)
+        return true
+    }
+
+    private fun isWalkableColumn(level: Level, base: BlockPos, floorY: Int): Boolean {
+        val feet = BlockPos(base.x, floorY, base.z)
+        if (!level.getBlockState(feet).isAir) return false
+        if (!level.getBlockState(feet.above()).isAir) return false
+        val ground = feet.below()
+        return !level.getBlockState(ground).isAir && !level.getBlockState(ground).liquid()
     }
 
     /** Direction de minage/déplacement effective : figée à l'activation, jamais celle du regard en direct. */

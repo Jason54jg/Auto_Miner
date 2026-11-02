@@ -1,6 +1,9 @@
 package com.jason54jg.autominer.client
 
 import com.jason54jg.autominer.AutoMiner
+import com.jason54jg.autominer.AutoMinerModConfig
+import com.jason54jg.autominer.CustomOreSelection
+import com.jason54jg.autominer.ToolSelection
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
@@ -24,6 +27,12 @@ object AutoMinerModClient : ClientModInitializer {
     private var mouseUngrabbed = false
 
     override fun onInitializeClient() {
+        val config = AutoMinerModConfig.load()
+        AutoMiner.applyConfig(config)
+        MiningHud.applyConfig(config)
+        ToolSelection.applyFromConfig(config)
+        CustomOreSelection.applyFromConfig(config)
+
         val category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("autominer", "main"))
         val toggleKey = KeyMappingHelper.registerKeyMapping(
             //? if >=26.3 {

@@ -4,6 +4,13 @@
 
 Each new request bumps the version by `0.0.1`.
 
+## 0.0.45
+- Audit / consistency: single client config bootstrap (AutoMiner, HUD, tool/block slots), value normalization on load/save, sidestep floor height with Y lock, Obstacles toggles disabled in forward-only mode, README aligned with actual persistence.
+
+## 0.0.44
+- **Redesigned config screen**: tabbed panel (General, Tunnel, Obstacles, Display), tool/mandatory-block column, Save / Cancel buttons.
+- **Smart navigation** (Obstacles tab, enabled by default on migrated configs): breaks nearby ceilings/walls, steps down one block under overhangs, sidesteps when an AOE pick leaves the tunnel blocked. "Forward only" mode restores legacy behavior.
+
 ## 0.0.43
 - Multi-version support via Stonecutter: separate jars for Minecraft **26.1.x** (26.1, 26.1.1, 26.1.2), **26.2** and **26.3** (`autominer-<version>+<mc>.jar` — see README for the matching Fabric API / Mod Menu versions). The 26.1 code path keeps the pre-26.2 APIs (`KeyBinding`, `ClientCommandManager`, `GuiGraphics`, `displayClientMessage`...).
 - Fix: mention alerts only listened to player chat (`CHAT`) — server announcements (`GAME`), which can also contain the player's name, now trigger the alert too.

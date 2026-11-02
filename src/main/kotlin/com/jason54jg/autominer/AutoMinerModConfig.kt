@@ -9,6 +9,7 @@ import java.nio.file.Files
  * (portée étendue, capacités de casse multiple, etc.).
  */
 data class AutoMinerModConfig(
+    var configVersion: Int = 2,
     var reach: Double = 4.5,
     var blocksPerTick: Int = 1,
     var lockYLevel: Boolean = false,
@@ -20,7 +21,14 @@ data class AutoMinerModConfig(
     var hudY: Int = 6,
     /** Identifiant ("namespace:path") de l'outil/du bloc obligatoire choisis, pour survivre à un redémarrage. */
     var toolItemId: String? = null,
-    var customBlockId: String? = null
+    var customBlockId: String? = null,
+    /** Décalage latéral d'un bloc si le tunnel est bloqué devant (mode intelligent). */
+    var bypassObstacles: Boolean = true,
+    /** Autorise de marcher dans une marche d'un bloc vers le bas (trou / sous un surplomb bas). */
+    var descendUnderOverhangs: Boolean = true,
+    var obstacleNavigationMode: ObstacleNavigationMode = ObstacleNavigationMode.SMART,
+    /** Rayon (en blocs) pour détecter plafond / murs latéraux à casser ou contourner. */
+    var obstacleDetectionReach: Int = 4
 ) {
     companion object {
         private val GSON = GsonBuilder().setPrettyPrinting().create()
@@ -30,14 +38,40 @@ data class AutoMinerModConfig(
             if (!Files.exists(PATH)) {
                 return AutoMinerModConfig().also(::save)
             }
-            return runCatching {
+            val loaded = runCatching {
                 Files.newBufferedReader(PATH).use { GSON.fromJson(it, AutoMinerModConfig::class.java) }
             }.getOrElse { AutoMinerModConfig() }
+            val resolved = loaded.migrateIfNeeded().normalized()
+            if (resolved != loaded) save(resolved)
+            return resolved
+        }
+
+        private fun AutoMinerModConfig.migrateIfNeeded(): AutoMinerModConfig {
+            if (configVersion >= 2) return this
+            val defaults = AutoMinerModConfig()
+            return copy(
+                configVersion = 2,
+                bypassObstacles = defaults.bypassObstacles,
+                descendUnderOverhangs = defaults.descendUnderOverhangs,
+                obstacleNavigationMode = defaults.obstacleNavigationMode,
+                obstacleDetectionReach = defaults.obstacleDetectionReach
+            )
+        }
+
+        private fun AutoMinerModConfig.normalized(): AutoMinerModConfig {
+            val defaults = AutoMinerModConfig()
+            return copy(
+                configVersion = 2,
+                reach = if (reach >= 1.0) reach else defaults.reach,
+                blocksPerTick = blocksPerTick.coerceAtLeast(1),
+                tunnelWidth = tunnelWidth.coerceIn(0, 2),
+                obstacleDetectionReach = obstacleDetectionReach.coerceIn(1, 6)
+            )
         }
 
         fun save(config: AutoMinerModConfig) {
             Files.createDirectories(PATH.parent)
-            Files.newBufferedWriter(PATH).use { GSON.toJson(config, it) }
+            Files.newBufferedWriter(PATH).use { GSON.toJson(config.normalized(), it) }
         }
     }
 }
